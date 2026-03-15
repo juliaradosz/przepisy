@@ -149,11 +149,3 @@ class ViewTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue(Recipe.objects.filter(slug='testowa-zupa').exists())
 
-    def test_comment_add(self):
-        self.client.login(username='testuser', password='testpass123')
-        response = self.client.post(
-            reverse('recipes:recipe_detail', kwargs={'slug': 'testowa-zupa'}),
-            {'content': 'Pyszne!', 'rating': 5},
-        )
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(Comment.objects.count(), 1)

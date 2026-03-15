@@ -5,9 +5,9 @@ from django.contrib import messages
 from django.db.models import Q, Avg
 from django.utils.text import slugify
 
-from .models import Recipe, Category, Tag, Comment, UserProfile
+from .models import Recipe, Category, Tag, UserProfile
 from .forms import (
-    RecipeForm, IngredientFormSet, CommentForm,
+    RecipeForm, IngredientFormSet,
     UserRegisterForm, UserProfileForm, SearchForm,
 )
 
@@ -35,32 +35,13 @@ def recipe_list(request):
 
 
 def recipe_detail(request, slug):
-    """Szczegóły przepisu z komentarzami."""
+    """Szczegóły przepisu."""
     recipe = get_object_or_404(Recipe, slug=slug, is_published=True)
-    comments = recipe.comments.select_related('author')
     ingredients = recipe.ingredients.all()
-
-    if request.method == 'POST' and request.user.is_authenticated:
-        comment_form = CommentForm(request.POST)
-        if comment_form.is_valid():
-            # Sprawdź czy użytkownik już skomentował
-            if Comment.objects.filter(recipe=recipe, author=request.user).exists():
-                messages.warning(request, 'Już dodałeś komentarz do tego przepisu.')
-            else:
-                comment = comment_form.save(commit=False)
-                comment.recipe = recipe
-                comment.author = request.user
-                comment.save()
-                messages.success(request, 'Komentarz został dodany.')
-                return redirect('recipes:recipe_detail', slug=slug)
-    else:
-        comment_form = CommentForm()
 
     return render(request, 'recipes/recipe_detail.html', {
         'recipe': recipe,
-        'comments': comments,
         'ingredients': ingredients,
-        'comment_form': comment_form,
     })
 
 
@@ -164,7 +145,7 @@ def search(request):
     if form.is_valid():
         query = form.cleaned_data.get('query')
         category = form.cleaned_data.get('category')
-        difficulty = form.cleaned_data.get('difficulty')
+        max_time = form.cleaned_data.get('max_time')
 
         if query:
             recipes = recipes.filter(
@@ -174,8 +155,11 @@ def search(request):
             ).distinct()
         if category:
             recipes = recipes.filter(category__slug=category)
-        if difficulty:
-            recipes = recipes.filter(difficulty=difficulty)
+        if max_time:
+            from django.db.models import F
+            recipes = recipes.annotate(
+                total_time=F('prep_time') + F('cook_time')
+            ).filter(total_time__lte=int(max_time))
 
     return render(request, 'recipes/search.html', {
         'form': form,

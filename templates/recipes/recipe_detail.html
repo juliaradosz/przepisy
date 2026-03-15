@@ -84,65 +84,6 @@
         </div>
         {% endif %}
 
-        <hr>
-
-        <!-- Komentarze -->
-        <h3 class="mb-3">Komentarze ({{ comments|length }})</h3>
-
-        {% if user.is_authenticated %}
-        <div class="card mb-4">
-            <div class="card-body">
-                <h5>Dodaj komentarz</h5>
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label class="form-label">Ocena</label>
-                        <div>
-                            {% for radio in comment_form.rating %}
-                            <div class="form-check form-check-inline">
-                                {{ radio }}
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_content" class="form-label">Treść</label>
-                        {{ comment_form.content }}
-                    </div>
-                    <button type="submit" class="btn btn-success">Dodaj komentarz</button>
-                </form>
-            </div>
-        </div>
-        {% else %}
-        <p class="text-muted"><a href="{% url 'recipes:login' %}">Zaloguj się</a>, aby dodać komentarz.</p>
-        {% endif %}
-
-        {% for comment in comments %}
-        <div class="card mb-3">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <strong>
-                        <a href="{% url 'recipes:profile' comment.author.username %}" class="text-decoration-none">
-                            {{ comment.author.username }}
-                        </a>
-                    </strong>
-                    <div class="rating-stars">
-                        {% for i in "12345" %}
-                            {% if forloop.counter <= comment.rating %}
-                                <i class="bi bi-star-fill"></i>
-                            {% else %}
-                                <i class="bi bi-star"></i>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-                <small class="text-muted">{{ comment.created_at|date:"d.m.Y H:i" }}</small>
-                <p class="mt-2 mb-0">{{ comment.content }}</p>
-            </div>
-        </div>
-        {% empty %}
-        <p class="text-muted">Brak komentarzy. Bądź pierwszy!</p>
-        {% endfor %}
     </div>
 
     <!-- Sidebar - składniki -->

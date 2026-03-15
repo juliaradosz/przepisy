@@ -72,7 +72,13 @@ class SearchForm(forms.Form):
         widget=forms.TextInput(attrs={'placeholder': 'Szukaj przepisów...', 'class': 'form-control'})
     )
     category = forms.CharField(required=False)
-    difficulty = forms.ChoiceField(
-        choices=[('', 'Wszystkie')] + Recipe.DIFFICULTY_CHOICES,
+    max_time = forms.ChoiceField(
+        choices=[
+            ('', 'Dowolny czas'),
+            ('15', 'Do 15 min'),
+            ('30', 'Do 30 min'),
+            ('60', 'Do 1 godziny'),
+            ('120', 'Do 2 godzin'),
+        ],
         required=False,
     )

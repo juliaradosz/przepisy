@@ -12,10 +12,10 @@
             {{ form.query }}
         </div>
         <div class="col-md-3">
-            <label class="form-label">Trudność</label>
-            <select name="difficulty" class="form-select">
-                {% for value, label in form.fields.difficulty.choices %}
-                <option value="{{ value }}" {% if form.difficulty.value == value %}selected{% endif %}>{{ label }}</option>
+            <label class="form-label">Czas przygotowania</label>
+            <select name="max_time" class="form-select">
+                {% for value, label in form.fields.max_time.choices %}
+                <option value="{{ value }}" {% if form.max_time.value == value %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
             </select>
         </div>

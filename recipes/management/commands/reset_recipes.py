@@ -15,22 +15,23 @@ class Command(BaseCommand):
         Tag.objects.all().delete()
         self.stdout.write('Usunięto wszystkie przepisy.')
 
-        # Pobierz lub stwórz użytkownika
         user = User.objects.first()
 
-        # Kategoria
-        cat, _ = Category.objects.get_or_create(name='Desery i wypieki', slug='desery-i-wypieki')
+        # Kategorie
+        cat_wypieki, _ = Category.objects.get_or_create(name='Desery i wypieki', slug='desery-i-wypieki')
 
         # Tagi
-        tag1, _ = Tag.objects.get_or_create(name='gofry', slug='gofry')
-        tag2, _ = Tag.objects.get_or_create(name='słodkie', slug='slodkie')
+        tag_gofry, _ = Tag.objects.get_or_create(name='gofry', slug='gofry')
+        tag_slodkie, _ = Tag.objects.get_or_create(name='słodkie', slug='slodkie')
+        tag_cynamon, _ = Tag.objects.get_or_create(name='cynamon', slug='cynamon')
+        tag_drozdzowe, _ = Tag.objects.get_or_create(name='drożdżowe', slug='drozdzowe')
 
-        # Przepis
-        recipe = Recipe.objects.create(
+        # === Chrupiące gofry ===
+        gofry = Recipe.objects.create(
             title='Chrupiące gofry',
             slug='chrupiace-gofry',
             author=user,
-            category=cat,
+            category=cat_wypieki,
             description='Przepis na chrupiące gofry - na 16 sztuk, wielkości 10 cm x 12 cm.',
             instructions=(
                 '1. Zaczynamy od oddzielenia białek od żółtek.\n'
@@ -54,10 +55,8 @@ class Command(BaseCommand):
             difficulty='easy',
             is_published=True,
         )
-        recipe.tags.add(tag1, tag2)
-
-        # Składniki
-        skladniki = [
+        gofry.tags.add(tag_gofry, tag_slodkie)
+        for name, qty, unit in [
             ('Mąka pszenna typu 500-550', '2', 'szklanki (300 g)'),
             ('Proszek do pieczenia', '1', 'łyżeczka (5 g)'),
             ('Sól', '1', 'szczypta (2 g)'),
@@ -65,8 +64,76 @@ class Command(BaseCommand):
             ('Cukier', '1', 'pełna łyżka (20 g)'),
             ('Olej', '1/3', 'szklanki (70 g)'),
             ('Jajka duże', '2', 'szt. (białka i żółtka oddzielnie)'),
-        ]
-        for name, qty, unit in skladniki:
-            Ingredient.objects.create(recipe=recipe, name=name, quantity=qty, unit=unit)
-
+        ]:
+            Ingredient.objects.create(recipe=gofry, name=name, quantity=qty, unit=unit)
         self.stdout.write(self.style.SUCCESS('Dodano: Chrupiące gofry'))
+
+        # === Cynamonki ===
+        cynamonki = Recipe.objects.create(
+            title='Cynamonki',
+            slug='cynamonki',
+            author=user,
+            category=cat_wypieki,
+            description='Pyszne drożdżowe bułeczki cynamonowe z nadzieniem z brązowego cukru i cynamonu, polane kremem śmietankowym.',
+            instructions=(
+                'Ciasto:\n'
+                '1. Z podanych składników odejmujemy 50 ml ciepłego mleka, 2 łyżki mąki, łyżkę cukru i drożdże '
+                '- wszystko mieszamy i odstawiamy aż rozczyn zacznie pracować (10 min).\n'
+                '2. Pozostałe składniki wkładamy do dużej miski, dodajemy rozczyn i wszystko wyrabiamy '
+                'robotem planetarnym bądź ręcznie przez 10 min.\n'
+                '3. Ciasto może się trochę kleić - nie martw się, będzie dobrze :)\n'
+                '4. Odstawiamy na godzinę w ciepłe miejsce.\n\n'
+                'Nadzienie:\n'
+                '5. W tym czasie robimy nadzienie: masło, cynamon, cukier z wanilią i brązowy cukier '
+                '- wszystko rozcieramy widelcem na gładką masę.\n\n'
+                'Formowanie:\n'
+                '6. Gdy ciasto wyrośnie, wałkujemy je na prostokąt. Nakładamy nadzienie, '
+                'zwijamy w rulon, dzielimy na 9 większych lub 12 mniejszych rolsów. '
+                'Najlepiej przy pomocy nitki.\n'
+                '7. Bułeczki układamy na blaszce, polewamy ciepłą śmietanką 30% i wstawiamy '
+                'do piekarnika 180 stopni góra-dół na jakieś 25 min (aż zrobią się rumiane).\n\n'
+                'Krem śmietankowy (opcjonalnie):\n'
+                '8. Masło z cukrem pudru ubijamy aż zrobi się puszyste, dodajemy serek kanapkowy '
+                'i sok z limonki, wszystko miksujemy na gładką masę.\n'
+                '9. Po wystudzeniu bułeczek smarujemy kremem śmietankowym.'
+            ),
+            prep_time=90,
+            cook_time=25,
+            servings=12,
+            difficulty='medium',
+            is_published=True,
+        )
+        cynamonki.tags.add(tag_slodkie, tag_cynamon, tag_drozdzowe)
+
+        # Składniki - ciasto
+        for name, qty, unit in [
+            ('Mąka pszenna', '550', 'g'),
+            ('Ciepłe mleko', '200', 'ml'),
+            ('Drożdże', '20', 'g'),
+            ('Roztopione masło', '90', 'g'),
+            ('Kwaśna śmietana 18%', '120', 'g'),
+            ('Jaja', '2', 'szt.'),
+            ('Cukier', '60', 'g'),
+            ('Śmietanka 30% (do polania)', '100', 'ml'),
+        ]:
+            Ingredient.objects.create(recipe=cynamonki, name=name, quantity=qty, unit=unit)
+
+        # Składniki - nadzienie
+        for name, qty, unit in [
+            ('Miękkie masło (nadzienie)', '100', 'g'),
+            ('Cynamon', '2', 'kopiaste łyżki'),
+            ('Cukier z wanilią', '1', 'łyżka'),
+            ('Brązowy cukier', '80', 'g'),
+        ]:
+            Ingredient.objects.create(recipe=cynamonki, name=name, quantity=qty, unit=unit)
+
+        # Składniki - krem
+        for name, qty, unit in [
+            ('Serek kanapkowy śmietankowy (krem)', '200', 'g'),
+            ('Miękkie masło (krem)', '70', 'g'),
+            ('Cukier pudru (krem)', '50', 'g'),
+            ('Sok z limonki (krem)', '2', 'łyżki'),
+        ]:
+            Ingredient.objects.create(recipe=cynamonki, name=name, quantity=qty, unit=unit)
+
+        self.stdout.write(self.style.SUCCESS('Dodano: Cynamonki'))
