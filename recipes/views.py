@@ -67,8 +67,7 @@ def recipe_create(request):
         if form.is_valid() and formset.is_valid():
             recipe = form.save(commit=False)
             recipe.author = request.user
-            recipe.slug = slugify(recipe.title)
-            # Upewnij się że slug jest unikalny
+            recipe.slug = slugify(recipe.title) if recipe.title else 'przepis'
             base_slug = recipe.slug
             counter = 1
             while Recipe.objects.filter(slug=recipe.slug).exists():

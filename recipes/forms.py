@@ -30,13 +30,18 @@ class RecipeForm(forms.ModelForm):
         fields = ['title', 'category', 'tags', 'description', 'instructions',
                   'servings', 'image']
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nazwa przepisu'}),
             'category': forms.Select(attrs={'class': 'form-select'}),
-            'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
-            'instructions': forms.Textarea(attrs={'rows': 8, 'class': 'form-control'}),
-            'servings': forms.NumberInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': 'Krotki opis przepisu'}),
+            'instructions': forms.Textarea(attrs={'rows': 8, 'class': 'form-control', 'placeholder': 'Sposob przygotowania...'}),
+            'servings': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'np. 4'}),
             'tags': forms.CheckboxSelectMultiple(),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = False
 
 
 class IngredientForm(forms.ModelForm):
@@ -49,7 +54,7 @@ class IngredientForm(forms.ModelForm):
 IngredientFormSet = forms.inlineformset_factory(
     Recipe, Ingredient,
     form=IngredientForm,
-    extra=5,
+    extra=1,
     can_delete=True,
     min_num=0,
     validate_min=False,

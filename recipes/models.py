@@ -65,8 +65,8 @@ class Recipe(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recipes', verbose_name='Autor')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='recipes', verbose_name='Kategoria')
     tags = models.ManyToManyField(Tag, blank=True, related_name='recipes', verbose_name='Tagi')
-    description = models.TextField(verbose_name='Opis')
-    instructions = models.TextField(verbose_name='Instrukcje przygotowania')
+    description = models.TextField(blank=True, verbose_name='Opis')
+    instructions = models.TextField(blank=True, verbose_name='Instrukcje przygotowania')
     prep_time = models.PositiveIntegerField(default=0, verbose_name='Czas przygotowania (min)')
     cook_time = models.PositiveIntegerField(default=0, verbose_name='Czas gotowania (min)')
     servings = models.PositiveIntegerField(default=4, verbose_name='Liczba porcji')
@@ -100,7 +100,7 @@ class Recipe(models.Model):
 class Ingredient(models.Model):
     """Składnik przepisu."""
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='ingredients', verbose_name='Przepis')
-    name = models.CharField(max_length=200, verbose_name='Nazwa')
+    name = models.CharField(max_length=200, blank=True, verbose_name='Nazwa')
     quantity = models.CharField(max_length=50, blank=True, verbose_name='Ilość')
     unit = models.CharField(max_length=50, blank=True, verbose_name='Jednostka')
 

@@ -47,9 +47,6 @@
             {% if field.errors %}
             <div class="invalid-feedback d-block">{{ field.errors.0 }}</div>
             {% endif %}
-            {% if field.help_text %}
-            <small class="form-text text-muted">{{ field.help_text }}</small>
-            {% endif %}
         </div>
         {% endif %}
         {% endfor %}
@@ -63,34 +60,39 @@
     <div class="form-card mb-3" style="max-width: none;">
         <h5 class="mb-3">Skladniki</h5>
         {{ formset.management_form }}
-        {% for ingredient_form in formset %}
-        <div class="row g-2 mb-2">
-            <div class="col-4">
-                <input type="text" name="{{ ingredient_form.name.html_name }}"
-                    value="{{ ingredient_form.name.value|default:'' }}"
-                    class="form-control" placeholder="Nazwa">
-            </div>
-            <div class="col-3">
-                <input type="text" name="{{ ingredient_form.quantity.html_name }}"
-                    value="{{ ingredient_form.quantity.value|default:'' }}"
-                    class="form-control" placeholder="Ilosc">
-            </div>
-            <div class="col-3">
-                <input type="text" name="{{ ingredient_form.unit.html_name }}"
-                    value="{{ ingredient_form.unit.value|default:'' }}"
-                    class="form-control" placeholder="Jednostka">
-            </div>
-            <div class="col-2">
-                {% if ingredient_form.DELETE %}
-                <div class="form-check mt-2">
-                    {{ ingredient_form.DELETE }}
-                    <label class="form-check-label text-danger">Usun</label>
+        <div id="ingredient-list">
+            {% for ingredient_form in formset %}
+            <div class="row g-2 mb-2 ingredient-row">
+                <div class="col-4">
+                    <input type="text" name="{{ ingredient_form.name.html_name }}"
+                        value="{{ ingredient_form.name.value|default:'' }}"
+                        class="form-control" placeholder="Nazwa">
                 </div>
-                {% endif %}
+                <div class="col-3">
+                    <input type="text" name="{{ ingredient_form.quantity.html_name }}"
+                        value="{{ ingredient_form.quantity.value|default:'' }}"
+                        class="form-control" placeholder="Ilosc">
+                </div>
+                <div class="col-3">
+                    <input type="text" name="{{ ingredient_form.unit.html_name }}"
+                        value="{{ ingredient_form.unit.value|default:'' }}"
+                        class="form-control" placeholder="Jednostka">
+                </div>
+                <div class="col-2">
+                    {% if ingredient_form.DELETE %}
+                    <div class="form-check mt-2">
+                        {{ ingredient_form.DELETE }}
+                        <label class="form-check-label text-danger">Usun</label>
+                    </div>
+                    {% endif %}
+                </div>
+                {% if ingredient_form.id %}{{ ingredient_form.id }}{% endif %}
             </div>
-            {% if ingredient_form.id %}{{ ingredient_form.id }}{% endif %}
+            {% endfor %}
         </div>
-        {% endfor %}
+        <button type="button" id="add-ingredient" class="btn btn-ghost btn-sm mt-1">
+            <i class="bi bi-plus-lg"></i> Dodaj skladnik
+        </button>
     </div>
 
     <div class="d-flex gap-2">
@@ -100,4 +102,38 @@
         <a href="{% url 'recipes:recipe_list' %}" class="btn btn-ghost">Anuluj</a>
     </div>
 </form>
+
+<script>
+document.getElementById('add-ingredient').addEventListener('click', function() {
+    var totalInput = document.getElementById('id_ingredients-TOTAL_FORMS');
+    var total = parseInt(totalInput.value);
+    var list = document.getElementById('ingredient-list');
+
+    var row = document.createElement('div');
+    row.className = 'row g-2 mb-2 ingredient-row';
+    row.innerHTML =
+        '<div class="col-4">' +
+            '<input type="text" name="ingredients-' + total + '-name" class="form-control" placeholder="Nazwa">' +
+        '</div>' +
+        '<div class="col-3">' +
+            '<input type="text" name="ingredients-' + total + '-quantity" class="form-control" placeholder="Ilosc">' +
+        '</div>' +
+        '<div class="col-3">' +
+            '<input type="text" name="ingredients-' + total + '-unit" class="form-control" placeholder="Jednostka">' +
+        '</div>' +
+        '<div class="col-2">' +
+            '<button type="button" class="btn btn-ghost btn-sm text-danger remove-ingredient" style="padding:8px;">' +
+                '<i class="bi bi-x-lg"></i>' +
+            '</button>' +
+        '</div>' +
+        '<input type="hidden" name="ingredients-' + total + '-id" value="">';
+
+    list.appendChild(row);
+    totalInput.value = total + 1;
+
+    row.querySelector('.remove-ingredient').addEventListener('click', function() {
+        row.remove();
+    });
+});
+</script>
 {% endblock %}
