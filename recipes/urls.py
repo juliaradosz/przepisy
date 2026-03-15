@@ -16,6 +16,7 @@ urlpatterns = [
 
     # Kategorie
     path('kategorie/', views.category_list, name='category_list'),
+    path('kategoria/nowa/', views.category_create, name='category_create'),
     path('kategoria/<slug:slug>/', views.category_detail, name='category_detail'),
 
     # Wyszukiwanie

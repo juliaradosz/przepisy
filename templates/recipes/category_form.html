@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Nowa kategoria{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <h2>Nowa kategoria</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+            <div class="invalid-feedback d-block">{{ field.errors.0 }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary-green w-100">Dodaj kategorie</button>
+    </form>
+    <p class="text-center mt-3 mb-0">
+        <a href="{% url 'recipes:category_list' %}">Wroc do kategorii</a>
+    </p>
+</div>
+{% endblock %}

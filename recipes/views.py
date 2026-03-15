@@ -7,7 +7,7 @@ from django.utils.text import slugify
 
 from .models import Recipe, Category, Tag, UserProfile, Favorite
 from .forms import (
-    RecipeForm, IngredientFormSet,
+    RecipeForm, IngredientFormSet, CategoryForm,
     UserRegisterForm, UserProfileForm, SearchForm,
 )
 
@@ -138,6 +138,27 @@ def category_list(request):
     """Lista kategorii."""
     categories = Category.objects.all()
     return render(request, 'recipes/category_list.html', {'categories': categories})
+
+
+@login_required
+def category_create(request):
+    """Tworzenie nowej kategorii."""
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            category = form.save(commit=False)
+            category.slug = slugify(category.name)
+            base_slug = category.slug
+            counter = 1
+            while Category.objects.filter(slug=category.slug).exists():
+                category.slug = f'{base_slug}-{counter}'
+                counter += 1
+            category.save()
+            messages.success(request, f'Kategoria "{category.name}" została dodana!')
+            return redirect('recipes:category_list')
+    else:
+        form = CategoryForm()
+    return render(request, 'recipes/category_form.html', {'form': form})
 
 
 def category_detail(request, slug):

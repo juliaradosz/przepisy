@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Recipe, Comment, Ingredient, UserProfile
+from .models import Recipe, Comment, Ingredient, UserProfile, Category
 
 
 class UserRegisterForm(UserCreationForm):
@@ -54,6 +54,17 @@ IngredientFormSet = forms.inlineformset_factory(
     min_num=0,
     validate_min=False,
 )
+
+
+class CategoryForm(forms.ModelForm):
+    """Formularz dodawania kategorii."""
+    class Meta:
+        model = Category
+        fields = ['name', 'description']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nazwa kategorii'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Opis (opcjonalnie)'}),
+        }
 
 
 class CommentForm(forms.ModelForm):
