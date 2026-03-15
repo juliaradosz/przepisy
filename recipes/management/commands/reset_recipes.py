@@ -185,3 +185,48 @@ class Command(BaseCommand):
             Ingredient.objects.create(recipe=makaron, name=name, quantity=qty, unit=unit)
 
         self.stdout.write(self.style.SUCCESS('Dodano: Makaron z kurczakiem w sosie serowym'))
+
+        # === Makaron z boczkiem w sosie serowym ===
+        tag_boczek, _ = Tag.objects.get_or_create(name='boczek', slug='boczek')
+
+        makaron_boczek = Recipe.objects.create(
+            title='Makaron z boczkiem w sosie serowym',
+            slug='makaron-z-boczkiem-w-sosie-serowym',
+            author=user,
+            category=cat_dania,
+            description='Szybki makaron z boczkiem w kremowym sosie serowym z parmezanem. Łatwe i smaczne!',
+            instructions=(
+                '1. Boczek kroimy w kostkę lub paski, dodajemy czosnek granulowany, paprykę wędzoną oraz sól.\n'
+                '2. Smażymy boczek na oliwie z oliwek aż będzie chrupiący.\n'
+                '3. Gotujemy makaron.\n'
+                '4. Usmażony boczek przekładamy na inne naczynie.\n'
+                '5. Na tej samej patelni rozpuszczamy masło, dodajemy łyżeczkę mąki, '
+                'mleko (jeżeli myślisz, że dałeś dużo to znaczy, że dałeś idealnie).\n'
+                '6. Można dodać czosnek (opcjonalnie).\n'
+                '7. Na koniec parmezan/grana padano i wszystko wymieszać.\n'
+                '8. Dodajemy makaron i boczek do sosu, mieszamy i podajemy.'
+            ),
+            prep_time=10,
+            cook_time=20,
+            servings=2,
+            difficulty='easy',
+            is_published=True,
+        )
+        makaron_boczek.tags.add(tag_szybkie, tag_makaron, tag_boczek)
+
+        for name, qty, unit in [
+            ('Boczek', '200', 'g'),
+            ('Czosnek granulowany', '1', 'łyżeczka'),
+            ('Papryka wędzona', '1', 'łyżeczka'),
+            ('Sól', '', 'do smaku'),
+            ('Oliwa z oliwek', '2', 'łyżki'),
+            ('Makaron', '200', 'g'),
+            ('Masło', '1', 'łyżka'),
+            ('Mąka', '1', 'łyżeczka'),
+            ('Mleko', '200', 'ml'),
+            ('Czosnek świeży (opcjonalnie)', '2', 'ząbki'),
+            ('Parmezan lub Grana Padano', '50', 'g'),
+        ]:
+            Ingredient.objects.create(recipe=makaron_boczek, name=name, quantity=qty, unit=unit)
+
+        self.stdout.write(self.style.SUCCESS('Dodano: Makaron z boczkiem w sosie serowym'))
