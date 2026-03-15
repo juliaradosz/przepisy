@@ -3,23 +3,17 @@
 {% block title %}{{ category.name }}{% endblock %}
 
 {% block content %}
-<a href="{% url 'recipes:category_list' %}" class="ghost-link d-inline-flex align-items-center gap-2 mb-3">
-    <i class="bi bi-arrow-left"></i> Wszystkie kategorie
+<a href="{% url 'recipes:category_list' %}" class="btn btn-link text-muted p-0 mb-2">
+    <i class="bi bi-arrow-left"></i> Kategorie
 </a>
 
-<section class="section-heading mb-4">
-    <div>
-        <h1>{{ category.name }}</h1>
-        <p>Przepisy przypisane do tej kategorii w jednolitym, profesjonalniejszym widoku kart.</p>
-    </div>
-    <span class="list-count">{{ recipes|length }} przepisow</span>
-</section>
+<h5 class="mb-3">{{ category.name }}</h5>
 
-<div class="row g-3 g-lg-4">
+<div class="row g-2">
     {% for recipe in recipes %}
-    <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+    <div class="col-6 col-md-4 col-lg-3">
         <a href="{% url 'recipes:recipe_detail' recipe.slug %}" class="text-decoration-none">
-            <div class="card recipe-card-compact">
+            <div class="card h-100 recipe-card-compact">
                 {% if recipe.image %}
                 <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
                 {% else %}
@@ -27,24 +21,16 @@
                     <i class="bi bi-egg-fried"></i>
                 </div>
                 {% endif %}
-                <div class="card-body">
-                    <h6 class="card-title">{{ recipe.title }}</h6>
-                    <div class="recipe-card-meta">
-                        <span>{{ recipe.servings }} porcji</span>
-                    </div>
+                <div class="card-body p-2">
+                    <h6 class="card-title mb-1">{{ recipe.title }}</h6>
+                    <small class="text-muted">{{ recipe.servings }} porcji</small>
                 </div>
             </div>
         </a>
     </div>
     {% empty %}
-    <div class="col-12">
-        <div class="glass-panel empty-state">
-            <div class="empty-state-icon">
-                <i class="bi bi-journal-bookmark"></i>
-            </div>
-            <h4>Brak przepisow w tej kategorii</h4>
-            <p class="text-muted mb-0">Ta sekcja jest jeszcze pusta.</p>
-        </div>
+    <div class="col-12 text-center py-4">
+        <p class="text-muted">Brak przepisów w tej kategorii</p>
     </div>
     {% endfor %}
 </div>

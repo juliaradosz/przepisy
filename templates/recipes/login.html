@@ -4,30 +4,26 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-lg-5 col-md-7">
-        <div class="glass-panel auth-card">
-            <div class="text-center mb-4">
-                <div class="empty-state-icon">
-                    <i class="bi bi-person-check"></i>
-                </div>
-                <h1 class="mb-2">Zaloguj sie</h1>
-                <p class="text-muted mb-0">Wroc do swojej kolekcji przepisow i ulubionych dan.</p>
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-body p-4">
+                <h2 class="text-center mb-4">Zaloguj się</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Nazwa użytkownika</label>
+                        <input type="text" name="username" id="username" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Hasło</label>
+                        <input type="password" name="password" id="password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Zaloguj się</button>
+                </form>
+                <p class="text-center mt-3">
+                    Nie masz konta? <a href="{% url 'recipes:register' %}">Zarejestruj się</a>
+                </p>
             </div>
-            <form method="post" class="form-grid">
-                {% csrf_token %}
-                <div>
-                    <label for="username" class="form-label">Nazwa uzytkownika</label>
-                    <input type="text" name="username" id="username" class="form-control" required>
-                </div>
-                <div>
-                    <label for="password" class="form-label">Haslo</label>
-                    <input type="password" name="password" id="password" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-success w-100">Zaloguj sie</button>
-            </form>
-            <p class="text-center mt-4 mb-0">
-                Nie masz konta? <a href="{% url 'recipes:register' %}">Zarejestruj sie</a>
-            </p>
         </div>
     </div>
 </div>

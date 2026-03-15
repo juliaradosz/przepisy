@@ -1,24 +1,24 @@
 {% extends 'base.html' %}
 
-{% block title %}Usun przepis{% endblock %}
+{% block title %}Usuń przepis{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-lg-5 col-md-7">
-        <div class="glass-panel auth-card text-center">
-            <div class="empty-state-icon mx-auto mb-3" style="background: rgba(195, 84, 84, 0.12); color: #c35454;">
-                <i class="bi bi-exclamation-triangle"></i>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body text-center">
+                <h2 class="text-danger"><i class="bi bi-exclamation-triangle"></i></h2>
+                <h3>Czy na pewno chcesz usunąć ten przepis?</h3>
+                <p class="text-muted">„{{ recipe.title }}"</p>
+                <p>Ta operacja jest nieodwracalna.</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Tak, usuń
+                    </button>
+                    <a href="{% url 'recipes:recipe_detail' recipe.slug %}" class="btn btn-secondary">Anuluj</a>
+                </form>
             </div>
-            <h1 class="mb-3">Usunac ten przepis?</h1>
-            <p class="text-muted mb-1">{{ recipe.title }}</p>
-            <p class="text-muted mb-4">Tej operacji nie da sie cofnac.</p>
-            <form method="post" class="d-flex justify-content-center gap-2 flex-wrap">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">
-                    <i class="bi bi-trash"></i> Tak, usun
-                </button>
-                <a href="{% url 'recipes:recipe_detail' recipe.slug %}" class="btn btn-outline-secondary">Anuluj</a>
-            </form>
         </div>
     </div>
 </div>

@@ -3,113 +3,59 @@
 {% block title %}Przepisy Kulinarne{% endblock %}
 
 {% block content %}
-<section class="page-hero mb-4">
-    <div class="page-kicker">Domowa biblioteka smakow</div>
-    <h1>Przepisy, ktore wygladaja jak prawdziwa aplikacja.</h1>
-    <p>Zbieraj sprawdzone dania, szybko wracaj do ulubionych i przegladaj inspiracje w bardziej uporzadkowanym, nowoczesnym ukladzie.</p>
-    <div class="hero-stats">
-        <div class="hero-stat">
-            <strong>{{ latest_recipes|length }}</strong>
-            <span>Najnowszych przepisow</span>
-        </div>
-        <div class="hero-stat">
-            <strong>{{ categories|length }}</strong>
-            <span>Dostepnych kategorii</span>
-        </div>
-        <div class="hero-stat">
-            <strong>1 klik</strong>
-            <span>Do wyszukiwania</span>
-        </div>
+<!-- Wyszukiwarka -->
+<form action="{% url 'recipes:search' %}" method="get" class="mb-3">
+    <div class="input-group">
+        <input type="text" name="query" class="form-control" placeholder="Czego szukasz?">
+        <button type="submit" class="btn btn-success">
+            <i class="bi bi-search"></i>
+        </button>
     </div>
-    <div class="hero-actions mt-4">
-        <a href="{% url 'recipes:recipe_list' %}" class="btn btn-light">Przegladaj przepisy</a>
-        <a href="{% url 'recipes:search' %}" class="btn btn-outline-light">Szukaj skladnikow</a>
-    </div>
-</section>
+</form>
 
-<section class="glass-panel p-3 p-md-4 mb-4">
-    <div class="section-heading">
-        <div>
-            <h3>Szybkie wyszukiwanie</h3>
-            <p>Znajdz danie po nazwie albo skladniku bez przeklikiwania sie przez cala baze.</p>
-        </div>
-    </div>
-    <form action="{% url 'recipes:search' %}" method="get">
-        <div class="input-group">
-            <input type="text" name="query" class="form-control" placeholder="Np. makaron, kurczak, deser">
-            <button type="submit" class="btn btn-success">
-                <i class="bi bi-search"></i> Szukaj
-            </button>
-        </div>
-    </form>
-</section>
-
+<!-- Kategorie - szybki dostęp -->
 {% if categories %}
-<section class="mb-4">
-    <div class="section-heading">
-        <div>
-            <h3>Kategorie</h3>
-            <p>Najwazniejsze sekcje w jednym miejscu, bez surowych przyciskow i przypadkowych odstepow.</p>
-        </div>
-        <a href="{% url 'recipes:category_list' %}" class="ghost-link">Zobacz wszystkie</a>
-    </div>
-    <div class="chip-row">
-        {% for category in categories %}
-        <a href="{% url 'recipes:category_detail' category.slug %}" class="chip">
-            <i class="bi bi-grid-1x2"></i>
-            <span>{{ category.name }}</span>
-        </a>
-        {% endfor %}
-    </div>
-</section>
+<div class="d-flex gap-2 mb-3 flex-wrap">
+    {% for category in categories %}
+    <a href="{% url 'recipes:category_detail' category.slug %}" class="btn btn-outline-success btn-sm rounded-pill">
+        {{ category.name }}
+    </a>
+    {% endfor %}
+</div>
 {% endif %}
 
-<section>
-    <div class="section-heading">
-        <div>
-            <h3>Najnowsze przepisy</h3>
-            <p>Zwarta siatka kart z czytelniejsza typografia i bardziej naturalna hierarchia informacji.</p>
-        </div>
-        {% if latest_recipes %}
-        <a href="{% url 'recipes:recipe_list' %}" class="btn btn-outline-success btn-sm">Wszystkie przepisy</a>
-        {% endif %}
-    </div>
-
-    <div class="row g-3 g-lg-4">
-        {% for recipe in latest_recipes %}
-        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-            <a href="{% url 'recipes:recipe_detail' recipe.slug %}" class="text-decoration-none">
-                <div class="card recipe-card-compact">
-                    {% if recipe.image %}
-                    <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
-                    {% else %}
-                    <div class="no-image-placeholder-sm">
-                        <i class="bi bi-egg-fried"></i>
-                    </div>
-                    {% endif %}
-                    <div class="card-body">
-                        <h6 class="card-title">{{ recipe.title }}</h6>
-                        <div class="recipe-card-meta">
-                            <span>{{ recipe.servings }} porcji</span>
-                            {% if recipe.category %}
-                            <span class="badge bg-success">{{ recipe.category.name }}</span>
-                            {% endif %}
-                        </div>
-                    </div>
+<!-- Wszystkie przepisy w kompaktowej liście -->
+<div class="row g-2">
+    {% for recipe in latest_recipes %}
+    <div class="col-6 col-md-4 col-lg-3">
+        <a href="{% url 'recipes:recipe_detail' recipe.slug %}" class="text-decoration-none">
+            <div class="card h-100 recipe-card-compact">
+                {% if recipe.image %}
+                <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
+                {% else %}
+                <div class="no-image-placeholder-sm">
+                    <i class="bi bi-egg-fried"></i>
                 </div>
-            </a>
-        </div>
-        {% empty %}
-        <div class="col-12">
-            <div class="glass-panel empty-state">
-                <div class="empty-state-icon">
-                    <i class="bi bi-journal-plus"></i>
+                {% endif %}
+                <div class="card-body p-2">
+                    <h6 class="card-title mb-1">{{ recipe.title }}</h6>
+                    <small class="text-muted">{{ recipe.servings }} porcji</small>
                 </div>
-                <h4>Brak przepisow</h4>
-                <p class="text-muted mb-0">Dodaj pierwszy przepis, zeby wypelnic strone glowna trescia.</p>
             </div>
-        </div>
-        {% endfor %}
+        </a>
     </div>
-</section>
+    {% empty %}
+    <div class="col-12 text-center py-4">
+        <p class="text-muted">Brak przepisów. Dodaj swój pierwszy!</p>
+    </div>
+    {% endfor %}
+</div>
+
+{% if latest_recipes %}
+<div class="text-center mt-3">
+    <a href="{% url 'recipes:recipe_list' %}" class="btn btn-outline-success">
+        Zobacz wszystkie przepisy
+    </a>
+</div>
+{% endif %}
 {% endblock %}
