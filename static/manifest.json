@@ -1,0 +1,25 @@
+{
+  "name": "Przepisy Kulinarne",
+  "short_name": "Przepisy",
+  "description": "Twoje ulubione przepisy kulinarne",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff5f8",
+  "theme_color": "#e91e90",
+  "orientation": "portrait-primary",
+  "lang": "pl",
+  "icons": [
+    {
+      "src": "/static/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
