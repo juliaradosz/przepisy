@@ -4,8 +4,8 @@
   "description": "Twoje ulubione przepisy kulinarne",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#fafaf7",
-  "theme_color": "#2d6a4f",
+  "background_color": "#fdf8f9",
+  "theme_color": "#c44569",
   "orientation": "portrait-primary",
   "lang": "pl",
   "icons": [
