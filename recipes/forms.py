@@ -51,8 +51,8 @@ IngredientFormSet = forms.inlineformset_factory(
     form=IngredientForm,
     extra=5,
     can_delete=True,
-    min_num=1,
-    validate_min=True,
+    min_num=0,
+    validate_min=False,
 )
 
 

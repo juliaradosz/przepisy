@@ -10,6 +10,21 @@
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
+    {% if form.errors or formset.errors or formset.non_form_errors %}
+    <div class="alert alert-danger">
+        <strong>Popraw bledy:</strong>
+        {% if form.errors %}
+        <ul class="mb-1">{% for field, errors in form.errors.items %}<li>{{ field }}: {{ errors.0 }}</li>{% endfor %}</ul>
+        {% endif %}
+        {% if formset.non_form_errors %}
+        <ul class="mb-1">{% for error in formset.non_form_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+        {% endif %}
+        {% for f in formset %}{% if f.errors %}
+        <ul class="mb-1">{% for field, errors in f.errors.items %}<li>Skladnik: {{ field }}: {{ errors.0 }}</li>{% endfor %}</ul>
+        {% endif %}{% endfor %}
+    </div>
+    {% endif %}
+
     <div class="form-card mb-3" style="max-width: none;">
         <h5 class="mb-3">Informacje o przepisie</h5>
         {% for field in form %}
