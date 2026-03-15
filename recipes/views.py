@@ -14,17 +14,11 @@ from .forms import (
 
 def home(request):
     """Strona główna z najnowszymi przepisami."""
-    latest_recipes = Recipe.objects.filter(is_published=True).select_related('author', 'category')[:6]
+    latest_recipes = Recipe.objects.filter(is_published=True).select_related('author', 'category')[:20]
     categories = Category.objects.all()
-    top_rated = (
-        Recipe.objects.filter(is_published=True)
-        .annotate(avg_rating=Avg('comments__rating'))
-        .order_by('-avg_rating')[:3]
-    )
     return render(request, 'recipes/home.html', {
         'latest_recipes': latest_recipes,
         'categories': categories,
-        'top_rated': top_rated,
     })
 
 

@@ -16,65 +16,31 @@
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+    <!-- Górny pasek nawigacji - uproszczony -->
+    <nav class="navbar navbar-dark bg-success sticky-top py-1">
         <div class="container">
             <a class="navbar-brand fw-bold" href="{% url 'recipes:home' %}">
-                <i class="bi bi-egg-fried"></i> Przepisy Kulinarne
+                <i class="bi bi-egg-fried"></i> Przepisy
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'recipes:recipe_list' %}">Przepisy</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'recipes:category_list' %}">Kategorie</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'recipes:search' %}">Szukaj</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'recipes:recipe_create' %}">
-                            <i class="bi bi-plus-circle"></i> Dodaj przepis
-                        </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle"></i> {{ user.username }}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{% url 'recipes:profile' user.username %}">Mój profil</a></li>
-                            {% if user.is_staff %}
-                            <li><a class="dropdown-item" href="{% url 'admin:index' %}">Panel admina</a></li>
-                            {% endif %}
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{% url 'recipes:logout' %}">Wyloguj</a></li>
-                        </ul>
-                    </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'recipes:login' %}">Zaloguj się</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'recipes:register' %}">Zarejestruj się</a>
-                    </li>
-                    {% endif %}
-                </ul>
+            <div class="d-flex gap-2 align-items-center">
+                <a href="{% url 'recipes:search' %}" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-search"></i>
+                </a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'recipes:recipe_create' %}" class="btn btn-light btn-sm">
+                    <i class="bi bi-plus"></i> Dodaj
+                </a>
+                {% endif %}
             </div>
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container mt-3 mb-5 pb-4">
         {% if messages %}
         {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show py-2" role="alert">
             {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert"></button>
         </div>
         {% endfor %}
         {% endif %}
@@ -82,11 +48,32 @@
         {% block content %}{% endblock %}
     </div>
 
-    <footer class="bg-dark text-light py-4 mt-5">
-        <div class="container text-center">
-            <p class="mb-0">&copy; 2025 Przepisy Kulinarne. Projekt z Programowania w języku Python.</p>
-        </div>
-    </footer>
+    <!-- Dolny pasek nawigacji - mobilny -->
+    <nav class="bottom-nav d-md-none">
+        <a href="{% url 'recipes:home' %}" class="bottom-nav-item">
+            <i class="bi bi-house"></i>
+            <span>Start</span>
+        </a>
+        <a href="{% url 'recipes:recipe_list' %}" class="bottom-nav-item">
+            <i class="bi bi-book"></i>
+            <span>Przepisy</span>
+        </a>
+        <a href="{% url 'recipes:search' %}" class="bottom-nav-item">
+            <i class="bi bi-search"></i>
+            <span>Szukaj</span>
+        </a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'recipes:profile' user.username %}" class="bottom-nav-item">
+            <i class="bi bi-person"></i>
+            <span>Profil</span>
+        </a>
+        {% else %}
+        <a href="{% url 'recipes:login' %}" class="bottom-nav-item">
+            <i class="bi bi-box-arrow-in-right"></i>
+            <span>Zaloguj</span>
+        </a>
+        {% endif %}
+    </nav>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>

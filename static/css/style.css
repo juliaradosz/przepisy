@@ -10,21 +10,51 @@ body {
     display: flex;
     flex-direction: column;
     background-color: #fff5f8;
+    font-size: 0.95rem;
 }
 
-.container.mt-4 {
+.container.mt-3 {
     flex: 1;
 }
 
-.card {
+/* Kompaktowe karty przepisów */
+.recipe-card-compact {
     transition: transform 0.2s;
     border: none;
-    box-shadow: 0 2px 8px rgba(233,30,144,0.1);
+    box-shadow: 0 1px 4px rgba(233,30,144,0.1);
+    overflow: hidden;
 }
 
-.card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 16px rgba(233,30,144,0.2);
+.recipe-card-compact:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 12px rgba(233,30,144,0.2);
+}
+
+.recipe-card-compact .card-img-top {
+    height: 120px;
+    object-fit: cover;
+}
+
+.recipe-card-compact .card-title {
+    font-size: 0.85rem;
+    line-height: 1.2;
+    color: #333;
+}
+
+.no-image-placeholder-sm {
+    height: 120px;
+    background: linear-gradient(135deg, var(--pink-bg), var(--pink-light));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--pink);
+    font-size: 2rem;
+}
+
+/* Stare klasy (zachowane dla kompatybilności) */
+.card {
+    border: none;
+    box-shadow: 0 1px 4px rgba(233,30,144,0.1);
 }
 
 .card-img-top {
@@ -33,7 +63,7 @@ body {
 }
 
 .recipe-hero-img {
-    max-height: 400px;
+    max-height: 300px;
     object-fit: cover;
     width: 100%;
     border-radius: 0.5rem;
@@ -43,14 +73,6 @@ body {
 .badge-difficulty-medium { background-color: var(--pink); }
 .badge-difficulty-hard { background-color: var(--pink-dark); }
 
-.hero-section {
-    background: linear-gradient(135deg, var(--pink-dark), var(--pink), var(--pink-light));
-    color: white;
-    padding: 4rem 0;
-    margin-top: -1.5rem;
-    margin-bottom: 2rem;
-}
-
 .rating-stars {
     color: #ffc107;
     font-size: 1.2rem;
@@ -59,33 +81,65 @@ body {
 .ingredient-list {
     list-style: none;
     padding-left: 0;
+    margin-bottom: 0;
 }
 
 .ingredient-list li {
-    padding: 0.4rem 0;
+    padding: 0.3rem 0;
     border-bottom: 1px dashed var(--pink-light);
+    font-size: 0.9rem;
 }
 
 .ingredient-list li:last-child {
     border-bottom: none;
 }
 
-.no-image-placeholder {
-    height: 200px;
-    background: linear-gradient(135deg, var(--pink-bg), var(--pink-light));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--pink);
-    font-size: 3rem;
+.instructions-text {
+    font-size: 0.93rem;
+    line-height: 1.7;
 }
 
 /* Navbar */
-.navbar-pink {
-    background: linear-gradient(90deg, var(--pink-dark), var(--pink));
+.bg-success {
+    background-color: var(--pink) !important;
 }
 
-/* Override Bootstrap btn-success -> pink */
+/* Dolny pasek nawigacji (mobile) */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    border-top: 1px solid #eee;
+    padding: 4px 0;
+    z-index: 1000;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #888;
+    font-size: 0.65rem;
+    padding: 4px 12px;
+}
+
+.bottom-nav-item i {
+    font-size: 1.2rem;
+    margin-bottom: 1px;
+}
+
+.bottom-nav-item:hover,
+.bottom-nav-item:active {
+    color: var(--pink);
+}
+
+/* Override Bootstrap colors -> pink */
 .btn-success, .btn-success:hover, .btn-success:active, .btn-success:focus {
     background-color: var(--pink) !important;
     border-color: var(--pink) !important;
@@ -102,21 +156,12 @@ body {
     color: #fff !important;
 }
 
-.bg-success {
-    background-color: var(--pink) !important;
-}
-
 .text-success {
     color: var(--pink) !important;
 }
 
 .badge.bg-success {
     background-color: var(--pink) !important;
-}
-
-/* Footer */
-footer {
-    background: linear-gradient(90deg, #2d2d2d, #1a1a1a) !important;
 }
 
 /* Links */
@@ -132,12 +177,24 @@ a:hover {
     color: inherit;
 }
 
-/* Profile circle */
-.bg-success.rounded-circle {
-    background-color: var(--pink) !important;
-}
-
 /* Card header */
 .card-header.bg-success {
     background-color: var(--pink) !important;
+}
+
+/* Mobile padding for bottom nav */
+@media (max-width: 767px) {
+    body {
+        padding-bottom: 60px;
+    }
+
+    .recipe-card-compact .card-img-top,
+    .no-image-placeholder-sm {
+        height: 100px;
+    }
+
+    .container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
 }
