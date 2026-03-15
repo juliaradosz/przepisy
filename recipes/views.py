@@ -61,6 +61,9 @@ def toggle_favorite(request, slug):
 @login_required
 def recipe_create(request):
     """Tworzenie nowego przepisu."""
+    if not request.user.is_staff:
+        messages.error(request, 'Nie masz uprawnień do dodawania przepisów.')
+        return redirect('recipes:recipe_list')
     if request.method == 'POST':
         form = RecipeForm(request.POST, request.FILES)
         formset = IngredientFormSet(request.POST)
@@ -93,10 +96,11 @@ def recipe_create(request):
 @login_required
 def recipe_update(request, slug):
     """Edycja przepisu."""
-    recipe = get_object_or_404(Recipe, slug=slug)
-    if recipe.author != request.user and not request.user.is_staff:
+    if not request.user.is_staff:
         messages.error(request, 'Nie masz uprawnień do edycji tego przepisu.')
         return redirect('recipes:recipe_detail', slug=slug)
+
+    recipe = get_object_or_404(Recipe, slug=slug)
 
     if request.method == 'POST':
         form = RecipeForm(request.POST, request.FILES, instance=recipe)
@@ -120,10 +124,11 @@ def recipe_update(request, slug):
 @login_required
 def recipe_delete(request, slug):
     """Usuwanie przepisu."""
-    recipe = get_object_or_404(Recipe, slug=slug)
-    if recipe.author != request.user and not request.user.is_staff:
+    if not request.user.is_staff:
         messages.error(request, 'Nie masz uprawnień do usunięcia tego przepisu.')
         return redirect('recipes:recipe_detail', slug=slug)
+
+    recipe = get_object_or_404(Recipe, slug=slug)
 
     if request.method == 'POST':
         recipe.delete()
@@ -142,6 +147,9 @@ def category_list(request):
 @login_required
 def category_create(request):
     """Tworzenie nowej kategorii."""
+    if not request.user.is_staff:
+        messages.error(request, 'Nie masz uprawnień do dodawania kategorii.')
+        return redirect('recipes:category_list')
     if request.method == 'POST':
         form = CategoryForm(request.POST)
         if form.is_valid():
@@ -254,11 +262,18 @@ def profile(request, username):
     user_profile, _ = UserProfile.objects.get_or_create(user=user)
     user_recipes = Recipe.objects.filter(author=user, is_published=True)
     favorite_recipes = Recipe.objects.filter(favorited_by__user=user)
+
+    # Lista wszystkich użytkowników dla staff
+    all_users = None
+    if request.user.is_authenticated and request.user.is_staff and request.user == user:
+        all_users = User.objects.all().order_by('username')
+
     return render(request, 'recipes/profile.html', {
         'profile_user': user,
         'user_profile': user_profile,
         'user_recipes': user_recipes,
         'favorite_recipes': favorite_recipes,
+        'all_users': all_users,
     })
 
 
@@ -281,6 +296,31 @@ def profile_edit(request, username):
         form = UserProfileForm(instance=user_profile)
 
     return render(request, 'recipes/profile_edit.html', {'form': form})
+
+
+@login_required
+def toggle_staff(request, user_id):
+    """Nadaj/odbierz uprawnienia użytkownikowi."""
+    if not request.user.is_staff:
+        messages.error(request, 'Nie masz uprawnień.')
+        return redirect('recipes:home')
+
+    from django.contrib.auth.models import User
+    target_user = get_object_or_404(User, id=user_id)
+
+    if target_user == request.user:
+        messages.error(request, 'Nie możesz zmienić własnych uprawnień.')
+        return redirect('recipes:profile', username=request.user.username)
+
+    target_user.is_staff = not target_user.is_staff
+    target_user.save()
+
+    if target_user.is_staff:
+        messages.success(request, f'Użytkownik {target_user.username} ma teraz uprawnienia do dodawania przepisów.')
+    else:
+        messages.info(request, f'Użytkownik {target_user.username} nie ma już uprawnień do dodawania przepisów.')
+
+    return redirect('recipes:profile', username=request.user.username)
 
 
 def handler404(request, exception):

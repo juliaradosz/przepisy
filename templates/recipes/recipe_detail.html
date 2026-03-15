@@ -62,7 +62,7 @@
     </div>
 </div>
 
-{% if user == recipe.author or user.is_staff %}
+{% if user.is_staff %}
 <div class="detail-actions">
     <a href="{% url 'recipes:recipe_update' recipe.slug %}" class="btn btn-outline-primary btn-sm">
         <i class="bi bi-pencil"></i> Edytuj

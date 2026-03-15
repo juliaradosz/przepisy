@@ -31,4 +31,5 @@ urlpatterns = [
     path('wyloguj/', views.user_logout, name='logout'),
     path('profil/<str:username>/', views.profile, name='profile'),
     path('profil/<str:username>/edytuj/', views.profile_edit, name='profile_edit'),
+    path('uzytkownik/<int:user_id>/uprawnienia/', views.toggle_staff, name='toggle_staff'),
 ]

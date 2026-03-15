@@ -54,4 +54,56 @@
     </div>
     {% endfor %}
 </div>
+
+{% if all_users %}
+<div class="section-header mt-4">
+    <h3><i class="bi bi-people"></i> Zarządzanie użytkownikami</h3>
+</div>
+
+<div class="form-card mb-3" style="max-width: none;">
+    <table class="table table-sm mb-0">
+        <thead>
+            <tr>
+                <th>Login</th>
+                <th>Email</th>
+                <th>Uprawnienia</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in all_users %}
+            <tr>
+                <td>{{ u.username }}</td>
+                <td>{{ u.email|default:"-" }}</td>
+                <td>
+                    {% if u.is_staff %}
+                    <span class="badge bg-success">Może dodawać przepisy</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Tylko przeglądanie</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if u != user %}
+                    <form method="post" action="{% url 'recipes:toggle_staff' u.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        {% if u.is_staff %}
+                        <button type="submit" class="btn btn-ghost btn-sm text-danger">
+                            <i class="bi bi-x-circle"></i> Odbierz
+                        </button>
+                        {% else %}
+                        <button type="submit" class="btn btn-ghost btn-sm text-success">
+                            <i class="bi bi-check-circle"></i> Nadaj
+                        </button>
+                        {% endif %}
+                    </form>
+                    {% else %}
+                    <small class="text-muted">Ty</small>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
 {% endblock %}

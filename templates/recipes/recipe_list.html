@@ -7,7 +7,7 @@
     <h1>Wszystkie przepisy</h1>
     <div class="d-flex align-items-center gap-2">
         <span class="count">{{ recipes|length }} przepisow</span>
-        {% if user.is_authenticated %}
+        {% if user.is_staff %}
         <a href="{% url 'recipes:recipe_create' %}" class="btn btn-primary-green btn-sm">
             <i class="bi bi-plus-lg"></i> Dodaj
         </a>
