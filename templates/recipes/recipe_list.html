@@ -3,42 +3,43 @@
 {% block title %}Przepisy{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="mb-0">Przepisy ({{ recipes|length }})</h5>
-    {% if user.is_authenticated %}
-    <a href="{% url 'recipes:recipe_create' %}" class="btn btn-success btn-sm">
-        <i class="bi bi-plus"></i> Dodaj
-    </a>
-    {% endif %}
+<div class="page-title">
+    <h1>Wszystkie przepisy</h1>
+    <div class="d-flex align-items-center gap-2">
+        <span class="count">{{ recipes|length }} przepisow</span>
+        {% if user.is_authenticated %}
+        <a href="{% url 'recipes:recipe_create' %}" class="btn btn-primary-green btn-sm">
+            <i class="bi bi-plus-lg"></i> Dodaj
+        </a>
+        {% endif %}
+    </div>
 </div>
 
-<div class="row g-2">
+<div class="recipe-grid">
     {% for recipe in recipes %}
-    <div class="col-6 col-md-4 col-lg-3">
-        <a href="{% url 'recipes:recipe_detail' recipe.slug %}" class="text-decoration-none">
-            <div class="card h-100 recipe-card-compact">
-                {% if recipe.image %}
-                <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
-                {% else %}
-                <div class="no-image-placeholder-sm">
-                    <i class="bi bi-egg-fried"></i>
-                </div>
-                {% endif %}
-                <div class="card-body p-2">
-                    <h6 class="card-title mb-1">{{ recipe.title }}</h6>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <small class="text-muted">{{ recipe.servings }} porcji</small>
-                        {% if recipe.category %}
-                        <small class="badge bg-success" style="font-size: 0.65rem;">{{ recipe.category.name }}</small>
-                        {% endif %}
-                    </div>
+    <div class="recipe-card">
+        <a href="{% url 'recipes:recipe_detail' recipe.slug %}" class="recipe-card-link">
+            {% if recipe.image %}
+            <img src="{{ recipe.image.url }}" class="recipe-card-img" alt="{{ recipe.title }}">
+            {% else %}
+            <div class="recipe-card-placeholder"><i class="bi bi-egg-fried"></i></div>
+            {% endif %}
+            <div class="recipe-card-body">
+                <h6 class="recipe-card-title">{{ recipe.title }}</h6>
+                <div class="recipe-card-meta">
+                    <span>{{ recipe.servings }} porcji</span>
+                    {% if recipe.category %}
+                    <span class="recipe-card-badge">{{ recipe.category.name }}</span>
+                    {% endif %}
                 </div>
             </div>
         </a>
     </div>
     {% empty %}
-    <div class="col-12 text-center py-4">
-        <p class="text-muted">Brak przepisów</p>
+    <div class="empty-state" style="grid-column: 1/-1;">
+        <i class="bi bi-journal-x"></i>
+        <h4>Brak przepisow</h4>
+        <p>Dodaj pierwszy przepis!</p>
     </div>
     {% endfor %}
 </div>

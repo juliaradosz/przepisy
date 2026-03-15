@@ -3,31 +3,21 @@
 {% block title %}Kategorie{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Kategorie przepisów</h1>
+<div class="page-title">
+    <h1>Kategorie</h1>
+</div>
 
-<div class="row g-4">
+<div class="category-grid">
     {% for category in categories %}
-    <div class="col-md-4 col-6">
-        <a href="{% url 'recipes:category_detail' category.slug %}" class="text-decoration-none">
-            <div class="card h-100 text-center p-4">
-                {% if category.image %}
-                <img src="{{ category.image.url }}" class="card-img-top mb-3" alt="{{ category.name }}">
-                {% else %}
-                <div class="no-image-placeholder mb-3 rounded">
-                    <i class="bi bi-grid"></i>
-                </div>
-                {% endif %}
-                <h4 class="text-success">{{ category.name }}</h4>
-                {% if category.description %}
-                <p class="text-muted">{{ category.description|truncatewords:15 }}</p>
-                {% endif %}
-                <span class="badge bg-success">{{ category.recipes.count }} przepisów</span>
-            </div>
-        </a>
-    </div>
+    <a href="{% url 'recipes:category_detail' category.slug %}" class="category-card">
+        <div class="category-card-icon"><i class="bi bi-bookmark"></i></div>
+        <h5>{{ category.name }}</h5>
+        <small>{{ category.recipes.count }} przepisow</small>
+    </a>
     {% empty %}
-    <div class="col-12 text-center py-5">
-        <h4 class="text-muted">Brak kategorii</h4>
+    <div class="empty-state" style="grid-column: 1/-1;">
+        <i class="bi bi-grid"></i>
+        <h4>Brak kategorii</h4>
     </div>
     {% endfor %}
 </div>

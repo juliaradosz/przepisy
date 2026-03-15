@@ -3,59 +3,56 @@
 {% block title %}Przepisy Kulinarne{% endblock %}
 
 {% block content %}
-<!-- Wyszukiwarka -->
-<form action="{% url 'recipes:search' %}" method="get" class="mb-3">
-    <div class="input-group">
-        <input type="text" name="query" class="form-control" placeholder="Czego szukasz?">
-        <button type="submit" class="btn btn-success">
-            <i class="bi bi-search"></i>
-        </button>
+<form action="{% url 'recipes:search' %}" method="get">
+    <div class="search-bar">
+        <input type="text" name="query" placeholder="Szukaj przepisu...">
+        <button type="submit"><i class="bi bi-search"></i> Szukaj</button>
     </div>
 </form>
 
-<!-- Kategorie - szybki dostęp -->
 {% if categories %}
-<div class="d-flex gap-2 mb-3 flex-wrap">
+<div class="category-pills">
     {% for category in categories %}
-    <a href="{% url 'recipes:category_detail' category.slug %}" class="btn btn-outline-success btn-sm rounded-pill">
-        {{ category.name }}
+    <a href="{% url 'recipes:category_detail' category.slug %}" class="pill">
+        <i class="bi bi-bookmark"></i> {{ category.name }}
     </a>
     {% endfor %}
 </div>
 {% endif %}
 
-<!-- Wszystkie przepisy w kompaktowej liście -->
-<div class="row g-2">
+<div class="section-header">
+    <h2>Najnowsze przepisy</h2>
+    <a href="{% url 'recipes:recipe_list' %}">Zobacz wszystkie &rarr;</a>
+</div>
+
+<div class="recipe-grid">
     {% for recipe in latest_recipes %}
-    <div class="col-6 col-md-4 col-lg-3">
-        <a href="{% url 'recipes:recipe_detail' recipe.slug %}" class="text-decoration-none">
-            <div class="card h-100 recipe-card-compact">
-                {% if recipe.image %}
-                <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
-                {% else %}
-                <div class="no-image-placeholder-sm">
-                    <i class="bi bi-egg-fried"></i>
-                </div>
-                {% endif %}
-                <div class="card-body p-2">
-                    <h6 class="card-title mb-1">{{ recipe.title }}</h6>
-                    <small class="text-muted">{{ recipe.servings }} porcji</small>
+    <div class="recipe-card">
+        <a href="{% url 'recipes:recipe_detail' recipe.slug %}" class="recipe-card-link">
+            {% if recipe.image %}
+            <img src="{{ recipe.image.url }}" class="recipe-card-img" alt="{{ recipe.title }}">
+            {% else %}
+            <div class="recipe-card-placeholder">
+                <i class="bi bi-egg-fried"></i>
+            </div>
+            {% endif %}
+            <div class="recipe-card-body">
+                <h6 class="recipe-card-title">{{ recipe.title }}</h6>
+                <div class="recipe-card-meta">
+                    <span>{{ recipe.servings }} porcji</span>
+                    {% if recipe.category %}
+                    <span class="recipe-card-badge">{{ recipe.category.name }}</span>
+                    {% endif %}
                 </div>
             </div>
         </a>
     </div>
     {% empty %}
-    <div class="col-12 text-center py-4">
-        <p class="text-muted">Brak przepisów. Dodaj swój pierwszy!</p>
+    <div class="empty-state" style="grid-column: 1/-1;">
+        <i class="bi bi-journal-plus"></i>
+        <h4>Brak przepisow</h4>
+        <p>Dodaj swoj pierwszy przepis!</p>
     </div>
     {% endfor %}
 </div>
-
-{% if latest_recipes %}
-<div class="text-center mt-3">
-    <a href="{% url 'recipes:recipe_list' %}" class="btn btn-outline-success">
-        Zobacz wszystkie przepisy
-    </a>
-</div>
-{% endif %}
 {% endblock %}
