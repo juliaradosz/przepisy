@@ -69,7 +69,7 @@ class Recipe(models.Model):
     instructions = models.TextField(blank=True, verbose_name='Instrukcje przygotowania')
     prep_time = models.PositiveIntegerField(default=0, verbose_name='Czas przygotowania (min)')
     cook_time = models.PositiveIntegerField(default=0, verbose_name='Czas gotowania (min)')
-    servings = models.PositiveIntegerField(default=4, verbose_name='Liczba porcji')
+    servings = models.PositiveIntegerField(blank=True, null=True, verbose_name='Liczba porcji')
     difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES, default='medium', verbose_name='Poziom trudności')
     image = models.ImageField(upload_to='recipes/', blank=True, null=True, verbose_name='Zdjęcie')
     created_at = models.DateTimeField(auto_now_add=True)
