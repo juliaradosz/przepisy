@@ -30,8 +30,11 @@ class RecipeForm(forms.ModelForm):
         fields = ['title', 'category', 'tags', 'description', 'instructions',
                   'servings', 'image']
         widgets = {
-            'description': forms.Textarea(attrs={'rows': 3}),
-            'instructions': forms.Textarea(attrs={'rows': 8}),
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-select'}),
+            'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'instructions': forms.Textarea(attrs={'rows': 8, 'class': 'form-control'}),
+            'servings': forms.NumberInput(attrs={'class': 'form-control'}),
             'tags': forms.CheckboxSelectMultiple(),
         }
 
