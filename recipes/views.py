@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.db.models import Q, Avg
 from django.utils.text import slugify
 
-from .models import Recipe, Category, Tag, UserProfile
+from .models import Recipe, Category, Tag, UserProfile, Favorite
 from .forms import (
     RecipeForm, IngredientFormSet,
     UserRegisterForm, UserProfileForm, SearchForm,
@@ -32,11 +32,30 @@ def recipe_detail(request, slug):
     """Szczegóły przepisu."""
     recipe = get_object_or_404(Recipe, slug=slug, is_published=True)
     ingredients = recipe.ingredients.all()
+    is_favorite = (
+        request.user.is_authenticated
+        and Favorite.objects.filter(user=request.user, recipe=recipe).exists()
+    )
 
     return render(request, 'recipes/recipe_detail.html', {
         'recipe': recipe,
         'ingredients': ingredients,
+        'is_favorite': is_favorite,
     })
+
+
+@login_required
+def toggle_favorite(request, slug):
+    """Dodaj/usuń przepis z ulubionych."""
+    recipe = get_object_or_404(Recipe, slug=slug)
+    favorite = Favorite.objects.filter(user=request.user, recipe=recipe)
+    if favorite.exists():
+        favorite.delete()
+        messages.info(request, 'Usunięto z ulubionych.')
+    else:
+        Favorite.objects.create(user=request.user, recipe=recipe)
+        messages.success(request, 'Dodano do ulubionych!')
+    return redirect('recipes:recipe_detail', slug=slug)
 
 
 @login_required
@@ -214,10 +233,12 @@ def profile(request, username):
     # Utwórz profil jeśli nie istnieje
     user_profile, _ = UserProfile.objects.get_or_create(user=user)
     user_recipes = Recipe.objects.filter(author=user, is_published=True)
+    favorite_recipes = Recipe.objects.filter(favorited_by__user=user)
     return render(request, 'recipes/profile.html', {
         'profile_user': user,
         'user_profile': user_profile,
         'user_recipes': user_recipes,
+        'favorite_recipes': favorite_recipes,
     })
 
 

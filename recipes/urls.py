@@ -21,6 +21,9 @@ urlpatterns = [
     # Wyszukiwanie
     path('szukaj/', views.search, name='search'),
 
+    # Ulubione
+    path('przepis/<slug:slug>/ulubione/', views.toggle_favorite, name='toggle_favorite'),
+
     # Użytkownicy
     path('rejestracja/', views.register, name='register'),
     path('logowanie/', views.user_login, name='login'),
