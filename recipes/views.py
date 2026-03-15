@@ -14,7 +14,7 @@ from .forms import (
 
 def home(request):
     """Strona główna z najnowszymi przepisami."""
-    latest_recipes = Recipe.objects.filter(is_published=True).select_related('author', 'category')[:20]
+    latest_recipes = Recipe.objects.filter(is_published=True).select_related('author', 'category')
     categories = Category.objects.all()
     return render(request, 'recipes/home.html', {
         'latest_recipes': latest_recipes,
