@@ -24,7 +24,7 @@
             <div class="recipe-card-body">
                 <h6 class="recipe-card-title">{{ recipe.title }}</h6>
                 <div class="recipe-card-meta">
-                    <span>{{ recipe.servings }} porcji</span>
+                    {% if recipe.servings %}<span>{{ recipe.servings }} porcji</span>{% endif %}
                 </div>
             </div>
         </a>

@@ -11,7 +11,7 @@
     <div>
         <h1>{{ recipe.title }}</h1>
         <div class="detail-badges">
-            <span class="detail-badge"><i class="bi bi-people"></i> {{ recipe.servings }} porcji</span>
+            {% if recipe.servings %}<span class="detail-badge"><i class="bi bi-people"></i> {{ recipe.servings }} porcji</span>{% endif %}
             {% if recipe.category %}
             <span class="detail-badge category">{{ recipe.category.name }}</span>
             {% endif %}
