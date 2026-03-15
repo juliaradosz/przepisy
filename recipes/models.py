@@ -101,7 +101,7 @@ class Ingredient(models.Model):
     """Składnik przepisu."""
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='ingredients', verbose_name='Przepis')
     name = models.CharField(max_length=200, verbose_name='Nazwa')
-    quantity = models.CharField(max_length=50, verbose_name='Ilość')
+    quantity = models.CharField(max_length=50, blank=True, verbose_name='Ilość')
     unit = models.CharField(max_length=50, blank=True, verbose_name='Jednostka')
 
     class Meta:
