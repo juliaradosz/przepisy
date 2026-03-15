@@ -3,31 +3,44 @@
 {% block title %}Kategorie{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Kategorie przepisów</h1>
+<section class="section-heading mb-4">
+    <div>
+        <h1>Kategorie przepisow</h1>
+        <p>Przegladaj kolekcje w bardziej uporzadkowanym, katalogowym widoku.</p>
+    </div>
+</section>
 
-<div class="row g-4">
+<div class="row g-3 g-lg-4">
     {% for category in categories %}
-    <div class="col-md-4 col-6">
+    <div class="col-12 col-sm-6 col-lg-4">
         <a href="{% url 'recipes:category_detail' category.slug %}" class="text-decoration-none">
-            <div class="card h-100 text-center p-4">
+            <div class="card category-card text-center p-3 p-md-4">
                 {% if category.image %}
                 <img src="{{ category.image.url }}" class="card-img-top mb-3" alt="{{ category.name }}">
                 {% else %}
-                <div class="no-image-placeholder mb-3 rounded">
+                <div class="no-image-placeholder mb-3 rounded-4">
                     <i class="bi bi-grid"></i>
                 </div>
                 {% endif %}
-                <h4 class="text-success">{{ category.name }}</h4>
+                <h4 class="mb-2">{{ category.name }}</h4>
                 {% if category.description %}
-                <p class="text-muted">{{ category.description|truncatewords:15 }}</p>
+                <p class="text-muted mb-3">{{ category.description|truncatewords:15 }}</p>
                 {% endif %}
-                <span class="badge bg-success">{{ category.recipes.count }} przepisów</span>
+                <div>
+                    <span class="badge bg-success">{{ category.recipes.count }} przepisow</span>
+                </div>
             </div>
         </a>
     </div>
     {% empty %}
-    <div class="col-12 text-center py-5">
-        <h4 class="text-muted">Brak kategorii</h4>
+    <div class="col-12">
+        <div class="glass-panel empty-state">
+            <div class="empty-state-icon">
+                <i class="bi bi-grid"></i>
+            </div>
+            <h4>Brak kategorii</h4>
+            <p class="text-muted mb-0">Dodaj pierwsze kategorie, aby ulatwic nawigacje po przepisach.</p>
+        </div>
     </div>
     {% endfor %}
 </div>

@@ -1,11 +1,11 @@
 {
   "name": "Przepisy Kulinarne",
   "short_name": "Przepisy",
-  "description": "Twoje ulubione przepisy kulinarne",
+  "description": "Nowoczesna aplikacja do przegladania i zapisywania ulubionych przepisow.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#fff5f8",
-  "theme_color": "#e91e90",
+  "background_color": "#f4efe7",
+  "theme_color": "#18352b",
   "orientation": "portrait-primary",
   "lang": "pl",
   "icons": [

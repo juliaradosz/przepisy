@@ -3,55 +3,74 @@
 {% block title %}Profil - {{ profile_user.username }}{% endblock %}
 
 {% block content %}
-<div class="text-center mb-4">
-    {% if user_profile.avatar %}
-    <img src="{{ user_profile.avatar.url }}" class="rounded-circle mb-2" style="width:80px;height:80px;object-fit:cover;" alt="Avatar">
-    {% else %}
-    <div class="rounded-circle mx-auto mb-2 bg-success text-white d-flex align-items-center justify-content-center" style="width:80px;height:80px;font-size:2rem;">
-        {{ profile_user.username.0|upper }}
-    </div>
-    {% endif %}
-    <h5>{{ profile_user.username }}</h5>
-    {% if user_profile.favorite_cuisine %}
-    <small class="text-muted"><i class="bi bi-heart"></i> {{ user_profile.favorite_cuisine }}</small>
-    {% endif %}
-    {% if user == profile_user %}
-    <div class="mt-2">
-        <a href="{% url 'recipes:profile_edit' profile_user.username %}" class="btn btn-outline-success btn-sm">
-            <i class="bi bi-pencil"></i> Edytuj profil
-        </a>
-        <a href="{% url 'recipes:logout' %}" class="btn btn-outline-secondary btn-sm">
-            Wyloguj
-        </a>
-    </div>
-    {% endif %}
-</div>
-
-<!-- Ulubione przepisy -->
-<h6 class="mb-2"><i class="bi bi-heart-fill text-danger"></i> Ulubione przepisy</h6>
-<div class="row g-2">
-    {% for recipe in favorite_recipes %}
-    <div class="col-6 col-md-4 col-lg-3">
-        <a href="{% url 'recipes:recipe_detail' recipe.slug %}" class="text-decoration-none">
-            <div class="card h-100 recipe-card-compact">
-                {% if recipe.image %}
-                <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
-                {% else %}
-                <div class="no-image-placeholder-sm">
-                    <i class="bi bi-egg-fried"></i>
-                </div>
-                {% endif %}
-                <div class="card-body p-2">
-                    <h6 class="card-title mb-1">{{ recipe.title }}</h6>
-                    <small class="text-muted">{{ recipe.servings }} porcji</small>
-                </div>
+<section class="glass-panel p-4 p-md-5 mb-4">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-4">
+        <div class="d-flex align-items-center gap-3">
+            {% if user_profile.avatar %}
+            <img src="{{ user_profile.avatar.url }}" class="profile-avatar" alt="Avatar">
+            {% else %}
+            <div class="profile-avatar-fallback">
+                {{ profile_user.username.0|upper }}
             </div>
-        </a>
+            {% endif %}
+            <div>
+                <div class="page-kicker text-muted mb-2">Profil uzytkownika</div>
+                <h1 class="mb-1">{{ profile_user.username }}</h1>
+                {% if user_profile.favorite_cuisine %}
+                <p class="text-muted mb-0"><i class="bi bi-heart"></i> Ulubiona kuchnia: {{ user_profile.favorite_cuisine }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% if user == profile_user %}
+        <div class="section-actions">
+            <a href="{% url 'recipes:profile_edit' profile_user.username %}" class="btn btn-outline-success">
+                <i class="bi bi-pencil"></i> Edytuj profil
+            </a>
+            <a href="{% url 'recipes:logout' %}" class="btn btn-outline-secondary">Wyloguj</a>
+        </div>
+        {% endif %}
     </div>
-    {% empty %}
-    <div class="col-12">
-        <p class="text-muted">Nie masz jeszcze ulubionych przepisów. Kliknij serduszko przy przepisie, aby dodać go tutaj.</p>
+</section>
+
+<section>
+    <div class="section-heading mb-4">
+        <div>
+            <h3>Ulubione przepisy</h3>
+            <p>Zebrane w czytelnej siatce, zeby profil wygladal jak pelny modul aplikacji.</p>
+        </div>
     </div>
-    {% endfor %}
-</div>
+    <div class="row g-3 g-lg-4">
+        {% for recipe in favorite_recipes %}
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+            <a href="{% url 'recipes:recipe_detail' recipe.slug %}" class="text-decoration-none">
+                <div class="card recipe-card-compact">
+                    {% if recipe.image %}
+                    <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
+                    {% else %}
+                    <div class="no-image-placeholder-sm">
+                        <i class="bi bi-egg-fried"></i>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h6 class="card-title">{{ recipe.title }}</h6>
+                        <div class="recipe-card-meta">
+                            <span>{{ recipe.servings }} porcji</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="glass-panel empty-state">
+                <div class="empty-state-icon">
+                    <i class="bi bi-heart"></i>
+                </div>
+                <h4>Brak ulubionych przepisow</h4>
+                <p class="text-muted mb-0">Dodaj serduszko przy przepisie, aby pojawil sie tutaj.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
 {% endblock %}
