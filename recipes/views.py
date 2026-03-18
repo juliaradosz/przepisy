@@ -5,10 +5,12 @@ from django.contrib import messages
 from django.db.models import Q, Avg
 from django.utils.text import slugify
 
-from .models import Recipe, Category, Tag, UserProfile, Favorite
+from collections import defaultdict
+
+from .models import Recipe, Category, Tag, UserProfile, Favorite, Event, EventRecipe
 from .forms import (
     RecipeForm, IngredientFormSet, CategoryForm,
-    UserRegisterForm, UserProfileForm, SearchForm,
+    UserRegisterForm, UserProfileForm, SearchForm, EventForm,
 )
 
 
@@ -321,6 +323,128 @@ def toggle_staff(request, user_id):
         messages.info(request, f'Użytkownik {target_user.username} nie ma już uprawnień do dodawania przepisów.')
 
     return redirect('recipes:profile', username=request.user.username)
+
+
+@login_required
+def event_list(request):
+    """Lista wydarzeń użytkownika."""
+    events = Event.objects.filter(user=request.user)
+    return render(request, 'recipes/event_list.html', {'events': events})
+
+
+@login_required
+def event_create(request):
+    """Tworzenie nowego wydarzenia."""
+    if request.method == 'POST':
+        form = EventForm(request.POST)
+        if form.is_valid():
+            event = form.save(commit=False)
+            event.user = request.user
+            event.save()
+            messages.success(request, f'Wydarzenie "{event.name}" zostało utworzone!')
+            return redirect('recipes:event_detail', pk=event.pk)
+    else:
+        form = EventForm()
+    return render(request, 'recipes/event_form.html', {'form': form, 'title': 'Nowe wydarzenie'})
+
+
+@login_required
+def event_detail(request, pk):
+    """Szczegóły wydarzenia z listą przepisów."""
+    event = get_object_or_404(Event, pk=pk, user=request.user)
+    event_recipes = event.event_recipes.select_related('recipe', 'recipe__category')
+    available_recipes = Recipe.objects.filter(is_published=True).exclude(
+        pk__in=event.recipes.values_list('pk', flat=True)
+    ).select_related('category')
+    return render(request, 'recipes/event_detail.html', {
+        'event': event,
+        'event_recipes': event_recipes,
+        'available_recipes': available_recipes,
+    })
+
+
+@login_required
+def event_edit(request, pk):
+    """Edycja wydarzenia."""
+    event = get_object_or_404(Event, pk=pk, user=request.user)
+    if request.method == 'POST':
+        form = EventForm(request.POST, instance=event)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Wydarzenie zostało zaktualizowane.')
+            return redirect('recipes:event_detail', pk=event.pk)
+    else:
+        form = EventForm(instance=event)
+    return render(request, 'recipes/event_form.html', {'form': form, 'title': 'Edytuj wydarzenie'})
+
+
+@login_required
+def event_delete(request, pk):
+    """Usuwanie wydarzenia."""
+    event = get_object_or_404(Event, pk=pk, user=request.user)
+    if request.method == 'POST':
+        event.delete()
+        messages.success(request, 'Wydarzenie zostało usunięte.')
+        return redirect('recipes:event_list')
+    return render(request, 'recipes/event_confirm_delete.html', {'event': event})
+
+
+@login_required
+def event_add_recipe(request, pk):
+    """Dodanie przepisu do wydarzenia."""
+    event = get_object_or_404(Event, pk=pk, user=request.user)
+    if request.method == 'POST':
+        recipe_id = request.POST.get('recipe_id')
+        recipe = get_object_or_404(Recipe, pk=recipe_id, is_published=True)
+        EventRecipe.objects.get_or_create(event=event, recipe=recipe)
+        messages.success(request, f'Dodano "{recipe.title}" do wydarzenia.')
+    return redirect('recipes:event_detail', pk=pk)
+
+
+@login_required
+def event_remove_recipe(request, pk, recipe_id):
+    """Usunięcie przepisu z wydarzenia."""
+    event = get_object_or_404(Event, pk=pk, user=request.user)
+    if request.method == 'POST':
+        EventRecipe.objects.filter(event=event, recipe_id=recipe_id).delete()
+        messages.info(request, 'Przepis został usunięty z wydarzenia.')
+    return redirect('recipes:event_detail', pk=pk)
+
+
+@login_required
+def event_toggle_done(request, pk, recipe_id):
+    """Odhaczenie/odznaczenie przepisu w wydarzeniu."""
+    event = get_object_or_404(Event, pk=pk, user=request.user)
+    event_recipe = get_object_or_404(EventRecipe, event=event, recipe_id=recipe_id)
+    event_recipe.is_done = not event_recipe.is_done
+    event_recipe.save()
+    return redirect('recipes:event_detail', pk=pk)
+
+
+@login_required
+def event_shopping_list(request, pk):
+    """Lista zakupów na podstawie przepisów w wydarzeniu."""
+    event = get_object_or_404(Event, pk=pk, user=request.user)
+    event_recipes = event.event_recipes.filter(is_done=False).select_related('recipe')
+
+    # Agreguj składniki po nazwie
+    shopping = defaultdict(list)
+    for er in event_recipes:
+        for ingredient in er.recipe.ingredients.all():
+            if ingredient.name:
+                shopping[ingredient.name.lower().strip()].append({
+                    'quantity': ingredient.quantity,
+                    'unit': ingredient.unit,
+                    'recipe': er.recipe.title,
+                })
+
+    # Posortuj alfabetycznie
+    shopping_list = sorted(shopping.items(), key=lambda x: x[0])
+
+    return render(request, 'recipes/event_shopping_list.html', {
+        'event': event,
+        'shopping_list': shopping_list,
+    })
 
 
 def handler404(request, exception):

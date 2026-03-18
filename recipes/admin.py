@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Tag, Recipe, Ingredient, Comment, UserProfile
+from .models import Category, Tag, Recipe, Ingredient, Comment, UserProfile, Event, EventRecipe
 
 
 class IngredientInline(admin.TabularInline):
@@ -37,3 +37,15 @@ class CommentAdmin(admin.ModelAdmin):
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
     list_display = ['user', 'favorite_cuisine', 'created_at']
+
+
+class EventRecipeInline(admin.TabularInline):
+    model = EventRecipe
+    extra = 1
+
+
+@admin.register(Event)
+class EventAdmin(admin.ModelAdmin):
+    list_display = ['name', 'user', 'date', 'created_at']
+    list_filter = ['date', 'user']
+    inlines = [EventRecipeInline]

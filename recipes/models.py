@@ -129,6 +129,50 @@ class Favorite(models.Model):
         return f'{self.user.username} - {self.recipe.title}'
 
 
+class Event(models.Model):
+    """Wydarzenie/okazja (np. Wielkanoc, Boże Narodzenie) z listą przepisów do przygotowania."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='events', verbose_name='Użytkownik')
+    name = models.CharField(max_length=200, verbose_name='Nazwa wydarzenia')
+    date = models.DateField(blank=True, null=True, verbose_name='Data wydarzenia')
+    description = models.TextField(blank=True, verbose_name='Opis')
+    recipes = models.ManyToManyField('Recipe', through='EventRecipe', blank=True, related_name='events', verbose_name='Przepisy')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Wydarzenie'
+        verbose_name_plural = 'Wydarzenia'
+        ordering = ['-date', '-created_at']
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def progress(self):
+        total = self.event_recipes.count()
+        if total == 0:
+            return 0
+        done = self.event_recipes.filter(is_done=True).count()
+        return int(done / total * 100)
+
+
+class EventRecipe(models.Model):
+    """Przepis przypisany do wydarzenia z możliwością odhaczenia."""
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='event_recipes')
+    recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE, related_name='event_entries')
+    is_done = models.BooleanField(default=False, verbose_name='Zrobione')
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Przepis w wydarzeniu'
+        verbose_name_plural = 'Przepisy w wydarzeniu'
+        unique_together = ['event', 'recipe']
+        ordering = ['added_at']
+
+    def __str__(self):
+        status = '✓' if self.is_done else '○'
+        return f'{status} {self.recipe.title}'
+
+
 class Comment(models.Model):
     """Komentarz do przepisu."""
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='comments', verbose_name='Przepis')

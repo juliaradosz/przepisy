@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Recipe, Comment, Ingredient, UserProfile, Category
+from .models import Recipe, Comment, Ingredient, UserProfile, Category, Event
 
 
 class UserRegisterForm(UserCreationForm):
@@ -80,6 +80,18 @@ class CommentForm(forms.ModelForm):
         widgets = {
             'content': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Napisz komentarz...'}),
             'rating': forms.RadioSelect(choices=[(i, f'{i} ★') for i in range(1, 6)]),
+        }
+
+
+class EventForm(forms.ModelForm):
+    """Formularz tworzenia/edycji wydarzenia."""
+    class Meta:
+        model = Event
+        fields = ['name', 'date', 'description']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'np. Wielkanoc 2026'}),
+            'date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Opis (opcjonalnie)'}),
         }
 
 

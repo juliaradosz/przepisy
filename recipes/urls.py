@@ -25,6 +25,17 @@ urlpatterns = [
     # Ulubione
     path('przepis/<slug:slug>/ulubione/', views.toggle_favorite, name='toggle_favorite'),
 
+    # Wydarzenia
+    path('wydarzenia/', views.event_list, name='event_list'),
+    path('wydarzenie/nowe/', views.event_create, name='event_create'),
+    path('wydarzenie/<int:pk>/', views.event_detail, name='event_detail'),
+    path('wydarzenie/<int:pk>/edytuj/', views.event_edit, name='event_edit'),
+    path('wydarzenie/<int:pk>/usun/', views.event_delete, name='event_delete'),
+    path('wydarzenie/<int:pk>/dodaj-przepis/', views.event_add_recipe, name='event_add_recipe'),
+    path('wydarzenie/<int:pk>/usun-przepis/<int:recipe_id>/', views.event_remove_recipe, name='event_remove_recipe'),
+    path('wydarzenie/<int:pk>/odhacz/<int:recipe_id>/', views.event_toggle_done, name='event_toggle_done'),
+    path('wydarzenie/<int:pk>/zakupy/', views.event_shopping_list, name='event_shopping_list'),
+
     # Użytkownicy
     path('rejestracja/', views.register, name='register'),
     path('logowanie/', views.user_login, name='login'),

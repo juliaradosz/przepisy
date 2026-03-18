@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Usuń wydarzenie{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <h2>Usuń wydarzenie</h2>
+    <p>Czy na pewno chcesz usunąć wydarzenie <strong>„{{ event.name }}"</strong>?</p>
+    <form method="post">
+        {% csrf_token %}
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-outline-danger flex-fill">Tak, usuń</button>
+            <a href="{% url 'recipes:event_detail' event.pk %}" class="btn btn-ghost flex-fill">Anuluj</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

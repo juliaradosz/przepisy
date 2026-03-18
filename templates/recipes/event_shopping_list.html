@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista zakupów - {{ event.name }}{% endblock %}
+
+{% block content %}
+<a href="{% url 'recipes:event_detail' event.pk %}" class="back-link">
+    <i class="bi bi-arrow-left"></i> {{ event.name }}
+</a>
+
+<div class="page-title">
+    <h1><i class="bi bi-cart3"></i> Lista zakupów</h1>
+</div>
+
+<p class="text-secondary" style="font-size: 0.85rem; margin-bottom: 16px;">
+    Na podstawie nieukończonych przepisów w wydarzeniu <strong>{{ event.name }}</strong>
+</p>
+
+{% if shopping_list %}
+<div class="shopping-list-card">
+    {% for name, entries in shopping_list %}
+    <div class="shopping-item">
+        <div class="shopping-item-check">
+            <i class="bi bi-square"></i>
+        </div>
+        <div class="shopping-item-info">
+            <strong>{{ name|title }}</strong>
+            <div class="shopping-item-details">
+                {% for entry in entries %}
+                <span class="shopping-detail">
+                    {% if entry.quantity %}{{ entry.quantity }}{% endif %}
+                    {% if entry.unit %}{{ entry.unit }}{% endif %}
+                    <small>({{ entry.recipe }})</small>
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="bi bi-cart-check"></i>
+    <h4>Lista jest pusta</h4>
+    <p>Wszystkie przepisy są już odhaczone lub nie mają składników.</p>
+</div>
+{% endif %}
+
+<script>
+document.querySelectorAll('.shopping-item').forEach(item => {
+    item.addEventListener('click', () => {
+        item.classList.toggle('checked');
+        const icon = item.querySelector('.shopping-item-check i');
+        icon.className = item.classList.contains('checked')
+            ? 'bi bi-check-square-fill' : 'bi bi-square';
+    });
+});
+</script>
+{% endblock %}
