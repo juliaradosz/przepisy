@@ -7,8 +7,8 @@
     <i class="bi bi-arrow-left"></i> Wszystkie wydarzenia
 </a>
 
-<div class="event-header">
-    <div>
+<div class="event-detail-top">
+    <div class="event-detail-info">
         <h1>{{ event.name }}</h1>
         {% if event.date %}
         <span class="detail-badge"><i class="bi bi-calendar3"></i> {{ event.date|date:"d.m.Y" }}</span>
@@ -17,56 +17,49 @@
         <p class="event-description">{{ event.description }}</p>
         {% endif %}
     </div>
-    <div class="event-actions">
+    <div class="event-detail-btns">
         <a href="{% url 'recipes:event_shopping_list' event.pk %}" class="btn btn-primary-green btn-sm">
             <i class="bi bi-cart3"></i> Lista zakupów
         </a>
         <a href="{% url 'recipes:event_edit' event.pk %}" class="btn btn-ghost btn-sm">
             <i class="bi bi-pencil"></i>
         </a>
-        <a href="{% url 'recipes:event_delete' event.pk %}" class="btn btn-ghost btn-sm" style="color: var(--text-secondary);">
+        <a href="{% url 'recipes:event_delete' event.pk %}" class="btn btn-ghost btn-sm">
             <i class="bi bi-trash"></i>
         </a>
     </div>
 </div>
 
 {% if event_recipes %}
-<div class="event-progress-bar">
-    <div class="event-progress-fill" style="width: {{ event.progress }}%"></div>
+<div class="event-progress-section">
+    <div class="event-progress-bar">
+        <div class="event-progress-fill" style="width: {{ event.progress }}%"></div>
+    </div>
+    <span class="event-progress-label">{{ event.progress }}% gotowe ({{ event_recipes|length }} przepisów)</span>
 </div>
-<p class="event-progress-text">
-    Gotowe: {{ event.progress }}%
-    ({{ event_recipes|length }} przepisów)
-</p>
 {% endif %}
 
-<div class="section-header" style="margin-top: 20px;">
-    <h3>Przepisy na to wydarzenie</h3>
+<div class="section-header" style="margin-top: 24px;">
+    <h3>Przepisy do przygotowania</h3>
 </div>
 
 {% if event_recipes %}
-<div class="event-recipe-list">
+<div class="er-list">
     {% for er in event_recipes %}
-    <div class="event-recipe-item {% if er.is_done %}done{% endif %}">
-        <form method="post" action="{% url 'recipes:event_toggle_done' event.pk er.recipe.pk %}" class="event-check-form">
+    <div class="er-row {% if er.is_done %}er-done{% endif %}">
+        <form method="post" action="{% url 'recipes:event_toggle_done' event.pk er.recipe.pk %}" style="display:flex;align-items:center;margin:0;">
             {% csrf_token %}
-            <button type="submit" class="event-check-btn">
-                {% if er.is_done %}
-                <i class="bi bi-check-circle-fill"></i>
-                {% else %}
-                <i class="bi bi-circle"></i>
-                {% endif %}
+            <button type="submit" class="er-check" title="{% if er.is_done %}Oznacz jako niezrobione{% else %}Oznacz jako zrobione{% endif %}">
+                <i class="bi {% if er.is_done %}bi-check-circle-fill{% else %}bi-circle{% endif %}"></i>
             </button>
         </form>
-        <div class="event-recipe-info">
-            <a href="{% url 'recipes:recipe_detail' er.recipe.slug %}">{{ er.recipe.title }}</a>
-            {% if er.recipe.category %}
-            <span class="recipe-card-badge">{{ er.recipe.category.name }}</span>
-            {% endif %}
-        </div>
-        <form method="post" action="{% url 'recipes:event_remove_recipe' event.pk er.recipe.pk %}">
+        <a href="{% url 'recipes:recipe_detail' er.recipe.slug %}" class="er-name">{{ er.recipe.title }}</a>
+        {% if er.recipe.category %}
+        <span class="er-badge">{{ er.recipe.category.name }}</span>
+        {% endif %}
+        <form method="post" action="{% url 'recipes:event_remove_recipe' event.pk er.recipe.pk %}" style="display:flex;align-items:center;margin:0;margin-left:auto;">
             {% csrf_token %}
-            <button type="submit" class="event-remove-btn" title="Usuń z wydarzenia">
+            <button type="submit" class="er-remove" title="Usuń z wydarzenia">
                 <i class="bi bi-x-lg"></i>
             </button>
         </form>
@@ -80,21 +73,19 @@
 </div>
 {% endif %}
 
-<div class="section-header" style="margin-top: 30px;">
+<div class="section-header" style="margin-top: 32px;">
     <h3>Dodaj przepis</h3>
 </div>
 
 {% if available_recipes %}
-<div class="event-add-recipe-list">
+<div class="er-list">
     {% for recipe in available_recipes %}
-    <div class="event-add-recipe-item">
-        <div class="event-recipe-info">
-            <a href="{% url 'recipes:recipe_detail' recipe.slug %}">{{ recipe.title }}</a>
-            {% if recipe.category %}
-            <span class="recipe-card-badge">{{ recipe.category.name }}</span>
-            {% endif %}
-        </div>
-        <form method="post" action="{% url 'recipes:event_add_recipe' event.pk %}">
+    <div class="er-row er-add-row">
+        <a href="{% url 'recipes:recipe_detail' recipe.slug %}" class="er-name">{{ recipe.title }}</a>
+        {% if recipe.category %}
+        <span class="er-badge">{{ recipe.category.name }}</span>
+        {% endif %}
+        <form method="post" action="{% url 'recipes:event_add_recipe' event.pk %}" style="display:flex;align-items:center;margin:0;margin-left:auto;">
             {% csrf_token %}
             <input type="hidden" name="recipe_id" value="{{ recipe.pk }}">
             <button type="submit" class="btn btn-ghost btn-sm">
