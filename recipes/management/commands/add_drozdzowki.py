@@ -31,15 +31,22 @@ class Command(BaseCommand):
 
         recipe, created = Recipe.objects.update_or_create(slug=slug, defaults=defaults)
 
+        # Przeliczenia: 1 lyzka cukru = 12 g, 1 lyzka mleka = 15 ml, 1 lyzka maki ~ 12 g
+        # Rozczyn zuzywa: 5 lyzek mleka (75 ml), 1 lyzka cukru (12 g), 1 lyzka maki (~12 g),
+        # caly pakiet drozdzy (25 g). Skladniki na "Ciasto" pokazuja pozostala ilosc po odjeciu.
         ingredients = [
-            # --- Ciasto (8-9 sztuk) ---
-            ('Cieple mleko (do ciasta)', '240', 'ml'),
+            # --- Rozczyn ---
+            ('Cieple mleko (rozczyn)', '5', 'lyzek (75 ml)'),
+            ('Swieze drozdze (rozczyn)', '25', 'g'),
+            ('Cukier (rozczyn)', '1', 'lyzka (12 g)'),
+            ('Maka pszenna (rozczyn)', '1', 'lyzka (~12 g)'),
+            # --- Ciasto (po odjeciu rozczynu) ---
+            ('Cieple mleko (ciasto, po odjeciu rozczynu)', '165', 'ml'),
             ('Smietana 18%', '2-3', 'lyzki'),
-            ('Cukier (do ciasta)', '5', 'lyzek'),
+            ('Cukier (ciasto, po odjeciu rozczynu)', '48', 'g (4 lyzki)'),
             ('Sol', '', 'szczypta'),
-            ('Swieze drozdze', '25', 'g'),
             ('Duze jajko (do ciasta)', '1', 'szt.'),
-            ('Maka pszenna (do ciasta)', '450', 'g'),
+            ('Maka pszenna (ciasto, po odjeciu rozczynu)', '438', 'g'),
             ('Roztopione maslo (lekko przestudzone)', '65', 'g'),
             ('Cukier waniliowy', '1', 'lyzeczka'),
             # --- Nadzienie budyniowe ---
