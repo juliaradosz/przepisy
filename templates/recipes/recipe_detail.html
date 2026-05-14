@@ -67,7 +67,7 @@
     {% if steps %}
     <ol class="recipe-steps-list">
         {% for step in steps %}
-        <li>{{ step.text }}</li>
+        <li>{{ step.text|linebreaksbr }}</li>
         {% endfor %}
     </ol>
     {% elif recipe.instructions %}

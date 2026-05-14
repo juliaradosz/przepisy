@@ -45,7 +45,7 @@
                 <div class="cook-step" data-step="{{ forloop.counter0 }}" {% if not forloop.first %}hidden{% endif %}>
                     <div class="cook-step-number">{{ forloop.counter }}</div>
                     <div class="cook-step-text">
-                        {% if step.text %}{{ step.text }}{% else %}{{ step }}{% endif %}
+                        {% if step.text %}{{ step.text|linebreaksbr }}{% else %}{{ step|linebreaksbr }}{% endif %}
                     </div>
                 </div>
                 {% endfor %}
