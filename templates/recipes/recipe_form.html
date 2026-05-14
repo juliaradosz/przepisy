@@ -10,7 +10,7 @@
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
-    {% if form.errors or formset.errors or formset.non_form_errors %}
+    {% if form.errors or formset.errors or formset.non_form_errors or step_formset.errors or step_formset.non_form_errors %}
     <div class="alert alert-danger">
         <strong>Popraw bledy:</strong>
         {% if form.errors %}
@@ -21,6 +21,12 @@
         {% endif %}
         {% for f in formset %}{% if f.errors %}
         <ul class="mb-1">{% for field, errors in f.errors.items %}<li>Skladnik: {{ field }}: {{ errors.0 }}</li>{% endfor %}</ul>
+        {% endif %}{% endfor %}
+        {% if step_formset.non_form_errors %}
+        <ul class="mb-1">{% for error in step_formset.non_form_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+        {% endif %}
+        {% for f in step_formset %}{% if f.errors %}
+        <ul class="mb-1">{% for field, errors in f.errors.items %}<li>Krok: {{ field }}: {{ errors.0 }}</li>{% endfor %}</ul>
         {% endif %}{% endfor %}
     </div>
     {% endif %}
@@ -95,6 +101,38 @@
         </button>
     </div>
 
+    <div class="form-card mb-3" style="max-width: none;">
+        <h5 class="mb-3">Kroki przygotowania</h5>
+        <p class="text-muted small mb-3">Kazdy krok zostanie pokazany osobno w trybie gotowania.</p>
+        {{ step_formset.management_form }}
+        <div id="step-list">
+            {% for step_form in step_formset %}
+            <div class="step-row mb-2">
+                <div class="d-flex gap-2 align-items-start">
+                    <div class="step-number-badge">{{ forloop.counter }}</div>
+                    <div class="flex-grow-1">
+                        <textarea name="{{ step_form.text.html_name }}"
+                            class="form-control" rows="2"
+                            placeholder="Opis kroku...">{{ step_form.text.value|default:'' }}</textarea>
+                    </div>
+                    <div class="d-flex flex-column gap-1">
+                        {% if step_form.DELETE %}
+                        <label class="form-check small text-danger" style="white-space: nowrap;">
+                            {{ step_form.DELETE }} Usun
+                        </label>
+                        {% endif %}
+                    </div>
+                </div>
+                <input type="hidden" name="{{ step_form.order.html_name }}" value="{{ forloop.counter }}">
+                {% if step_form.id %}{{ step_form.id }}{% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        <button type="button" id="add-step" class="btn btn-ghost btn-sm mt-1">
+            <i class="bi bi-plus-lg"></i> Dodaj krok
+        </button>
+    </div>
+
     <div class="d-flex gap-2">
         <button type="submit" class="btn btn-primary-green">
             <i class="bi bi-check-circle"></i> Zapisz przepis
@@ -132,6 +170,37 @@ document.getElementById('add-ingredient').addEventListener('click', function() {
     totalInput.value = total + 1;
 
     row.querySelector('.remove-ingredient').addEventListener('click', function() {
+        row.remove();
+    });
+});
+
+document.getElementById('add-step').addEventListener('click', function() {
+    var totalInput = document.getElementById('id_steps-TOTAL_FORMS');
+    var total = parseInt(totalInput.value);
+    var list = document.getElementById('step-list');
+    var newOrder = list.querySelectorAll('.step-row').length + 1;
+
+    var row = document.createElement('div');
+    row.className = 'step-row mb-2';
+    row.innerHTML =
+        '<div class="d-flex gap-2 align-items-start">' +
+            '<div class="step-number-badge">' + newOrder + '</div>' +
+            '<div class="flex-grow-1">' +
+                '<textarea name="steps-' + total + '-text" class="form-control" rows="2" placeholder="Opis kroku..."></textarea>' +
+            '</div>' +
+            '<div class="d-flex flex-column gap-1">' +
+                '<button type="button" class="btn btn-ghost btn-sm text-danger remove-step" style="padding:4px 8px;">' +
+                    '<i class="bi bi-x-lg"></i>' +
+                '</button>' +
+            '</div>' +
+        '</div>' +
+        '<input type="hidden" name="steps-' + total + '-order" value="' + newOrder + '">' +
+        '<input type="hidden" name="steps-' + total + '-id" value="">';
+
+    list.appendChild(row);
+    totalInput.value = total + 1;
+
+    row.querySelector('.remove-step').addEventListener('click', function() {
         row.remove();
     });
 });

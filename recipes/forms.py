@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Recipe, Comment, Ingredient, UserProfile, Category, Event
+from .models import Recipe, Comment, Ingredient, Step, UserProfile, Category, Event
 
 
 class UserRegisterForm(UserCreationForm):
@@ -27,13 +27,12 @@ class RecipeForm(forms.ModelForm):
     """Formularz dodawania/edycji przepisu."""
     class Meta:
         model = Recipe
-        fields = ['title', 'category', 'tags', 'description', 'instructions',
+        fields = ['title', 'category', 'tags', 'description',
                   'servings', 'image']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nazwa przepisu'}),
             'category': forms.Select(attrs={'class': 'form-select'}),
             'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': 'Krotki opis przepisu'}),
-            'instructions': forms.Textarea(attrs={'rows': 8, 'class': 'form-control', 'placeholder': 'Sposob przygotowania...'}),
             'servings': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'np. 4'}),
             'tags': forms.CheckboxSelectMultiple(),
         }
@@ -54,6 +53,31 @@ class IngredientForm(forms.ModelForm):
 IngredientFormSet = forms.inlineformset_factory(
     Recipe, Ingredient,
     form=IngredientForm,
+    extra=1,
+    can_delete=True,
+    min_num=0,
+    validate_min=False,
+)
+
+
+class StepForm(forms.ModelForm):
+    """Formularz pojedynczego kroku."""
+    class Meta:
+        model = Step
+        fields = ['order', 'text']
+        widgets = {
+            'order': forms.HiddenInput(),
+            'text': forms.Textarea(attrs={
+                'rows': 2,
+                'class': 'form-control',
+                'placeholder': 'Opis kroku...',
+            }),
+        }
+
+
+StepFormSet = forms.inlineformset_factory(
+    Recipe, Step,
+    form=StepForm,
     extra=1,
     can_delete=True,
     min_num=0,

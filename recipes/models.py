@@ -114,6 +114,21 @@ class Ingredient(models.Model):
         return f'{self.quantity} - {self.name}'
 
 
+class Step(models.Model):
+    """Pojedynczy krok przygotowania przepisu."""
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='steps', verbose_name='Przepis')
+    order = models.PositiveIntegerField(default=1, verbose_name='Kolejność')
+    text = models.TextField(verbose_name='Treść kroku')
+
+    class Meta:
+        verbose_name = 'Krok'
+        verbose_name_plural = 'Kroki'
+        ordering = ['order', 'id']
+
+    def __str__(self):
+        return f'Krok {self.order}: {self.text[:40]}'
+
+
 class Favorite(models.Model):
     """Ulubiony przepis użytkownika."""
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorites')

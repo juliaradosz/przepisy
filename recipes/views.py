@@ -9,7 +9,7 @@ from collections import defaultdict
 
 from .models import Recipe, Category, Tag, UserProfile, Favorite, Event, EventRecipe
 from .forms import (
-    RecipeForm, IngredientFormSet, CategoryForm,
+    RecipeForm, IngredientFormSet, StepFormSet, CategoryForm,
     UserRegisterForm, UserProfileForm, SearchForm, EventForm,
 )
 
@@ -34,6 +34,7 @@ def recipe_detail(request, slug):
     """Szczegóły przepisu."""
     recipe = get_object_or_404(Recipe, slug=slug, is_published=True)
     ingredients = recipe.ingredients.all()
+    steps = recipe.steps.all()
     is_favorite = (
         request.user.is_authenticated
         and Favorite.objects.filter(user=request.user, recipe=recipe).exists()
@@ -42,7 +43,32 @@ def recipe_detail(request, slug):
     return render(request, 'recipes/recipe_detail.html', {
         'recipe': recipe,
         'ingredients': ingredients,
+        'steps': steps,
         'is_favorite': is_favorite,
+    })
+
+
+def recipe_cook(request, slug):
+    """Tryb gotowania krok po kroku."""
+    recipe = get_object_or_404(Recipe, slug=slug, is_published=True)
+    steps = list(recipe.steps.all())
+    if not steps and recipe.instructions:
+        import re
+        num_prefix = re.compile(r'^\s*\d+\s*[.)]\s*')
+        parsed = []
+        for raw in recipe.instructions.splitlines():
+            text = raw.strip()
+            if not text:
+                continue
+            text = num_prefix.sub('', text).strip()
+            if text:
+                parsed.append(text)
+        steps = parsed
+    ingredients = recipe.ingredients.all()
+    return render(request, 'recipes/recipe_cook.html', {
+        'recipe': recipe,
+        'steps': steps,
+        'ingredients': ingredients,
     })
 
 
@@ -69,7 +95,8 @@ def recipe_create(request):
     if request.method == 'POST':
         form = RecipeForm(request.POST, request.FILES)
         formset = IngredientFormSet(request.POST)
-        if form.is_valid() and formset.is_valid():
+        step_formset = StepFormSet(request.POST)
+        if form.is_valid() and formset.is_valid() and step_formset.is_valid():
             recipe = form.save(commit=False)
             recipe.author = request.user
             recipe.slug = slugify(recipe.title) if recipe.title else 'przepis'
@@ -82,15 +109,24 @@ def recipe_create(request):
             form.save_m2m()  # Zapisz tagi ManyToMany
             formset.instance = recipe
             formset.save()
+            step_formset.instance = recipe
+            steps = step_formset.save(commit=False)
+            for idx, step in enumerate(steps, start=1):
+                step.order = idx
+                step.save()
+            for obj in step_formset.deleted_objects:
+                obj.delete()
             messages.success(request, 'Przepis został dodany!')
             return redirect('recipes:recipe_detail', slug=recipe.slug)
     else:
         form = RecipeForm()
         formset = IngredientFormSet()
+        step_formset = StepFormSet()
 
     return render(request, 'recipes/recipe_form.html', {
         'form': form,
         'formset': formset,
+        'step_formset': step_formset,
         'title': 'Dodaj przepis',
     })
 
@@ -107,18 +143,27 @@ def recipe_update(request, slug):
     if request.method == 'POST':
         form = RecipeForm(request.POST, request.FILES, instance=recipe)
         formset = IngredientFormSet(request.POST, instance=recipe)
-        if form.is_valid() and formset.is_valid():
+        step_formset = StepFormSet(request.POST, instance=recipe)
+        if form.is_valid() and formset.is_valid() and step_formset.is_valid():
             recipe = form.save()
             formset.save()
+            steps = step_formset.save(commit=False)
+            for idx, step in enumerate(steps, start=1):
+                step.order = idx
+                step.save()
+            for obj in step_formset.deleted_objects:
+                obj.delete()
             messages.success(request, 'Przepis został zaktualizowany!')
             return redirect('recipes:recipe_detail', slug=recipe.slug)
     else:
         form = RecipeForm(instance=recipe)
         formset = IngredientFormSet(instance=recipe)
+        step_formset = StepFormSet(instance=recipe)
 
     return render(request, 'recipes/recipe_form.html', {
         'form': form,
         'formset': formset,
+        'step_formset': step_formset,
         'title': 'Edytuj przepis',
     })
 

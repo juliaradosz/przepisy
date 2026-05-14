@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block title %}Gotowanie: {{ recipe.title }}{% endblock %}
+
+{% block content %}
+<div class="cook-mode" id="cookMode">
+    <div class="cook-header">
+        <a href="{% url 'recipes:recipe_detail' recipe.slug %}" class="btn btn-ghost btn-sm">
+            <i class="bi bi-x-lg"></i> Zakoncz
+        </a>
+        <div class="cook-title">{{ recipe.title }}</div>
+        <button type="button" id="wakeLockBtn" class="btn btn-ghost btn-sm" title="Nie usypiaj ekranu">
+            <i class="bi bi-lightbulb"></i>
+        </button>
+    </div>
+
+    {% if steps %}
+    <div class="cook-progress-wrap">
+        <div class="cook-progress-bar"><div class="cook-progress-fill" id="cookProgress"></div></div>
+        <div class="cook-progress-label">
+            Krok <span id="stepCurrent">1</span> z <span id="stepTotal">{{ steps|length }}</span>
+        </div>
+    </div>
+
+    <div class="cook-layout">
+        <aside class="cook-sidebar">
+            <h6 class="cook-sidebar-title"><i class="bi bi-basket"></i> Skladniki</h6>
+            <ul class="cook-ingredient-list">
+                {% for ingredient in ingredients %}
+                <li>
+                    <label>
+                        <input type="checkbox" class="cook-check">
+                        <span><strong>{{ ingredient.quantity }}{% if ingredient.unit %} {{ ingredient.unit }}{% endif %}</strong> {{ ingredient.name }}</span>
+                    </label>
+                </li>
+                {% empty %}
+                <li class="text-muted small">Brak skladnikow</li>
+                {% endfor %}
+            </ul>
+        </aside>
+
+        <main class="cook-main">
+            <div class="cook-steps">
+                {% for step in steps %}
+                <div class="cook-step" data-step="{{ forloop.counter0 }}" {% if not forloop.first %}hidden{% endif %}>
+                    <div class="cook-step-number">{{ forloop.counter }}</div>
+                    <div class="cook-step-text">
+                        {% if step.text %}{{ step.text }}{% else %}{{ step }}{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="cook-nav">
+                <button type="button" id="prevStep" class="btn btn-ghost" disabled>
+                    <i class="bi bi-arrow-left"></i> Poprzedni
+                </button>
+                <button type="button" id="nextStep" class="btn btn-primary-green">
+                    Nastepny <i class="bi bi-arrow-right"></i>
+                </button>
+                <a href="{% url 'recipes:recipe_detail' recipe.slug %}" id="doneBtn" class="btn btn-primary-green" hidden>
+                    <i class="bi bi-check-lg"></i> Gotowe!
+                </a>
+            </div>
+        </main>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-list-ol" style="font-size: 48px;"></i>
+        <h3>Ten przepis nie ma jeszcze krokow</h3>
+        <a href="{% url 'recipes:recipe_detail' recipe.slug %}" class="btn btn-primary-green mt-3">
+            Wroc do przepisu
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.cook-mode { max-width: 1100px; margin: 0 auto; }
+.cook-header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 8px 0 16px; border-bottom: 1px solid var(--border); margin-bottom: 20px;
+}
+.cook-title {
+    font-family: 'DM Serif Display', Georgia, serif; font-size: 20px;
+    flex: 1; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cook-progress-wrap { margin-bottom: 24px; }
+.cook-progress-bar {
+    height: 8px; background: var(--green-bg); border-radius: 999px; overflow: hidden;
+}
+.cook-progress-fill {
+    height: 100%; background: var(--green); border-radius: 999px;
+    transition: width 0.3s ease; width: 0%;
+}
+.cook-progress-label {
+    text-align: center; font-size: 14px; color: var(--text-secondary);
+    margin-top: 8px; font-weight: 500;
+}
+.cook-layout {
+    display: grid; grid-template-columns: 280px 1fr; gap: 24px;
+}
+.cook-sidebar {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px; align-self: start; position: sticky; top: 80px;
+}
+.cook-sidebar-title { margin: 0 0 12px; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); }
+.cook-ingredient-list { list-style: none; padding: 0; margin: 0; }
+.cook-ingredient-list li { padding: 6px 0; border-bottom: 1px solid var(--border); }
+.cook-ingredient-list li:last-child { border-bottom: none; }
+.cook-ingredient-list label { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; margin: 0; font-size: 14px; }
+.cook-ingredient-list input[type=checkbox]:checked + span { text-decoration: line-through; color: var(--text-secondary); }
+.cook-main { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; }
+.cook-steps { min-height: 240px; }
+.cook-step { display: flex; gap: 20px; align-items: flex-start; }
+.cook-step[hidden] { display: none; }
+.cook-step-number {
+    flex-shrink: 0; width: 64px; height: 64px; border-radius: 50%;
+    background: var(--green); color: white; display: flex; align-items: center;
+    justify-content: center; font-family: 'DM Serif Display', serif; font-size: 32px;
+}
+.cook-step-text {
+    font-size: 22px; line-height: 1.5; padding-top: 12px;
+}
+.cook-nav {
+    display: flex; gap: 12px; justify-content: space-between;
+    margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border);
+}
+.cook-nav .btn { padding: 12px 24px; font-size: 16px; }
+.step-number-badge {
+    flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%;
+    background: var(--green); color: white; display: flex;
+    align-items: center; justify-content: center; font-weight: 600; font-size: 14px;
+}
+@media (max-width: 768px) {
+    .cook-layout { grid-template-columns: 1fr; }
+    .cook-sidebar { position: static; }
+    .cook-main { padding: 20px; }
+    .cook-step { flex-direction: column; gap: 12px; }
+    .cook-step-number { width: 48px; height: 48px; font-size: 24px; }
+    .cook-step-text { font-size: 18px; padding-top: 0; }
+}
+</style>
+
+<script>
+(function() {
+    var steps = document.querySelectorAll('.cook-step');
+    if (steps.length === 0) return;
+
+    var total = steps.length;
+    var current = 0;
+    var prevBtn = document.getElementById('prevStep');
+    var nextBtn = document.getElementById('nextStep');
+    var doneBtn = document.getElementById('doneBtn');
+    var progressFill = document.getElementById('cookProgress');
+    var stepCurrentEl = document.getElementById('stepCurrent');
+
+    function render() {
+        steps.forEach(function(el, idx) {
+            if (idx === current) { el.removeAttribute('hidden'); } else { el.setAttribute('hidden', ''); }
+        });
+        stepCurrentEl.textContent = current + 1;
+        progressFill.style.width = ((current + 1) / total * 100) + '%';
+        prevBtn.disabled = (current === 0);
+        if (current === total - 1) {
+            nextBtn.setAttribute('hidden', '');
+            doneBtn.removeAttribute('hidden');
+        } else {
+            nextBtn.removeAttribute('hidden');
+            doneBtn.setAttribute('hidden', '');
+        }
+    }
+
+    prevBtn.addEventListener('click', function() {
+        if (current > 0) { current--; render(); }
+    });
+    nextBtn.addEventListener('click', function() {
+        if (current < total - 1) { current++; render(); }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ') { if (current < total - 1) { current++; render(); e.preventDefault(); } }
+        if (e.key === 'ArrowLeft') { if (current > 0) { current--; render(); e.preventDefault(); } }
+    });
+
+    // Wake Lock — don't dim the screen
+    var wakeLock = null;
+    var wakeLockBtn = document.getElementById('wakeLockBtn');
+    function setWakeLockIcon(on) {
+        wakeLockBtn.innerHTML = on
+            ? '<i class="bi bi-lightbulb-fill text-warning"></i>'
+            : '<i class="bi bi-lightbulb"></i>';
+    }
+    wakeLockBtn.addEventListener('click', async function() {
+        if ('wakeLock' in navigator) {
+            try {
+                if (wakeLock) { await wakeLock.release(); wakeLock = null; setWakeLockIcon(false); }
+                else { wakeLock = await navigator.wakeLock.request('screen'); setWakeLockIcon(true); }
+            } catch (e) { /* ignore */ }
+        }
+    });
+    document.addEventListener('visibilitychange', async function() {
+        if (wakeLock !== null && document.visibilityState === 'visible') {
+            try { wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
+        }
+    });
+
+    render();
+})();
+</script>
+{% endblock %}
