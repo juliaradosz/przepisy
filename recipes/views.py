@@ -111,9 +111,15 @@ def recipe_create(request):
             formset.save()
             step_formset.instance = recipe
             steps = step_formset.save(commit=False)
-            for idx, step in enumerate(steps, start=1):
-                step.order = idx
+            order = 1
+            for step in steps:
+                if not (step.text or '').strip():
+                    if step.pk:
+                        step.delete()
+                    continue
+                step.order = order
                 step.save()
+                order += 1
             for obj in step_formset.deleted_objects:
                 obj.delete()
             messages.success(request, 'Przepis został dodany!')
@@ -148,9 +154,15 @@ def recipe_update(request, slug):
             recipe = form.save()
             formset.save()
             steps = step_formset.save(commit=False)
-            for idx, step in enumerate(steps, start=1):
-                step.order = idx
+            order = 1
+            for step in steps:
+                if not (step.text or '').strip():
+                    if step.pk:
+                        step.delete()
+                    continue
+                step.order = order
                 step.save()
+                order += 1
             for obj in step_formset.deleted_objects:
                 obj.delete()
             messages.success(request, 'Przepis został zaktualizowany!')

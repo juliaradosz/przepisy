@@ -74,6 +74,13 @@ class StepForm(forms.ModelForm):
             }),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Hidden `order` is auto-filled by the template, so Django considers
+        # every trailing extra form "changed" and would otherwise validate
+        # `text` as required. Make text optional and filter empties in the view.
+        self.fields['text'].required = False
+
 
 StepFormSet = forms.inlineformset_factory(
     Recipe, Step,
